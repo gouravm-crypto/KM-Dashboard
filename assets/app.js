@@ -82,14 +82,24 @@
 
   // ---------- CaratLane "C" mark, traced from the logo (20 diamonds) ----------
   const C_MARK = ["559.7,0 471.6,42.6 556.8,127.8 642,42.6", "556.8,176.1 491.5,241.5 562.5,272.7 622.2,241.5", "724.4,90.9 616.5,136.4 679,204.5 769.9,198.9", "821,116.5 821,235.8 940.3,238.6 911.9,147.7", "693.2,272.7 718.8,340.9 786.9,363.6 786.9,272.7", "786.9,636.4 718.8,659.1 693.2,730.1 784.1,730.1", "821,764.2 821,886.4 909.1,855.1 943.2,764.2", "676.1,798.3 616.5,866.5 724.4,911.9 769.9,804", "559.7,727.3 491.5,758.5 556.8,823.9 622.2,758.5", "554,875 471.6,960.2 559.7,1000 642,960.2", "343.8,801.1 389.2,911.9 497.2,866.5 437.5,798.3", "326.7,636.4 326.7,727.3 420.5,730.1 397.7,661.9", "170.5,764.2 201.7,852.3 292.6,886.4 292.6,764.2", "190.3,559.7 144.9,667.6 252.8,713.1 258.5,619.3", "298.3,434.7 233,500 298.3,565.3 329.5,502.8", "96.6,414.8 56.8,502.8 99.4,585.2 181.8,497.2", "255.7,286.9 147.7,332.4 190.3,440.3 261.4,377.8", "292.6,116.5 204.5,144.9 170.5,235.8 292.6,235.8", "329.5,272.7 329.5,363.6 394.9,340.9 420.5,272.7", "389.2,90.9 343.8,196 434.7,204.5 497.2,133.5"];
-  function markSVG() {
+  function markSVG(sparkles = 10) {
     let out = "";
     C_MARK.forEach((pts, i) => {
       const a = Math.random() * Math.PI * 2, d = 260 + Math.random() * 380;
       out += '<polygon class="shard" style="--i:' + i + ";--dx:" + Math.round(Math.cos(a) * d) + "px;--dy:" + Math.round(Math.sin(a) * d) +
         "px;--rot:" + Math.round(Math.random() * 360 - 180) + 'deg" points="' + pts + '"/>';
     });
-    return '<svg viewBox="0 0 1000 1000" aria-hidden="true">' + out + "</svg>";
+    // purple sparkles that twinkle on random diamonds once the C has formed
+    const picks = C_MARK.map((_, i) => i).sort(() => Math.random() - 0.5).slice(0, sparkles);
+    picks.forEach((i, n) => {
+      const xy = C_MARK[i].split(" ").map((p) => p.split(",").map(Number));
+      const cx = xy.reduce((a, p) => a + p[0], 0) / xy.length, cy = xy.reduce((a, p) => a + p[1], 0) / xy.length;
+      const size = 16 + Math.random() * 18;
+      out += '<g transform="translate(' + cx.toFixed(1) + " " + cy.toFixed(1) + ") scale(" + size.toFixed(1) + ')"><path class="sparkle" d="M0,-1 C.12,-.12 .12,-.12 1,0 C.12,.12 .12,.12 0,1 C-.12,.12 -.12,.12 -1,0 C-.12,-.12 -.12,-.12 0,-1Z" style="--delay:' +
+        (1.8 + n * 0.35 + Math.random()).toFixed(2) + "s;--dur:" + (2.6 + Math.random() * 1.8).toFixed(2) + 's"/></g>';
+    });
+    return '<svg viewBox="0 0 1000 1000" aria-hidden="true"><defs><linearGradient id="shardGrad" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="var(--mark-a)"/><stop offset="1" stop-color="var(--mark-b)"/></linearGradient></defs>' + out + "</svg>";
   }
 
   // ---------- Score colour: 80+ green (deeper toward 100), below 80 red (deeper toward 0) ----------
@@ -112,7 +122,8 @@
       '<circle class="gauge-track" cx="125" cy="125" r="104" fill="none" stroke-width="14"/>' +
       '<circle class="gauge-arc" cx="125" cy="125" r="104" fill="none" stroke="' + color + '" stroke-width="14" stroke-linecap="round" ' +
       'transform="rotate(-90 125 125)" stroke-dasharray="0 999"/>' +
-      '<polygon class="gauge-gem" points="0,-11 8,0 0,11 -8,0" fill="' + color + '" stroke="var(--surface)" stroke-width="2.5" transform="translate(125 21)"/>' +
+      '<g class="gauge-gem" transform="translate(125 21)"><polygon points="0,-11 8,0 0,11 -8,0" fill="' + color + '" stroke="var(--surface)" stroke-width="2.5"/>' +
+      '<g transform="translate(10 -12) scale(9)"><path class="sparkle gauge-spark" d="M0,-1 C.12,-.12 .12,-.12 1,0 C.12,.12 .12,.12 0,1 C-.12,.12 -.12,.12 -1,0 C-.12,-.12 -.12,-.12 0,-1Z"/></g></g>' +
       "</svg>";
   }
   function animateGauge(el, score) {
@@ -123,12 +134,12 @@
       const ang = t * 2 * Math.PI;
       gem.setAttribute("transform", "translate(" + (G.c + G.r * Math.sin(ang)).toFixed(2) + " " + (G.c - G.r * Math.cos(ang)).toFixed(2) + ") rotate(" + (t * 360).toFixed(1) + ")");
     };
-    if (reduceMotion) { set(target); return; }
+    if (reduceMotion) { set(target); el.classList.add("done"); return; }
     const start = performance.now() + 200, dur = 1400;
     const step = (now) => {
       const p = Math.max(0, Math.min(1, (now - start) / dur));
       set(target * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) requestAnimationFrame(step);
+      if (p < 1) requestAnimationFrame(step); else el.classList.add("done");
     };
     set(0);
     requestAnimationFrame(step);
@@ -160,6 +171,22 @@
       if (p < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
+  }
+
+  function animateCounts(root) {
+    root.querySelectorAll("[data-count]").forEach((el, n) => {
+      const to = Number(el.dataset.count);
+      if (el.dataset.count === "" || !isFinite(to)) return;
+      if (reduceMotion) { el.textContent = to; return; }
+      el.textContent = "0";
+      const start = performance.now() + 300 + n * 70, dur = 1100;
+      const step = (now) => {
+        const p = Math.max(0, Math.min(1, (now - start) / dur));
+        el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
   }
 
   // ---------- Search ----------
@@ -255,6 +282,7 @@
     app.innerHTML = '<div class="view">' + html + "</div>";
     app.querySelectorAll("[data-search]").forEach(bindSearch);
     bindTheme();
+    animateCounts(app);
     window.scrollTo(0, 0);
     if (after) after();
   }
@@ -290,7 +318,7 @@
   }
   function facts(s) {
     const f = [["Region", s.region], ["City", s.city], ["State", s.state], ["Format", s.format], ["Type", s.type], ["Tier", s.tier]];
-    return '<dl class="facts">' + f.map(([k, v]) => "<div><dt>" + k + "</dt><dd>" + esc(v || "–") + "</dd></div>").join("") + "</dl>";
+    return '<dl class="facts">' + f.map(([k, v], n) => '<div style="--n:' + n + '"><dt>' + k + "</dt><dd>" + esc(v || "–") + "</dd></div>").join("") + "</dl>";
   }
   function concern() {
     return '<section class="section"><div class="concern"><p><strong>Something in this report doesn’t look right?</strong>' +
@@ -324,7 +352,7 @@
       '<p class="ids"><span class="code">' + esc(s.code) + "</span><span>" + esc(s.erp) + '</span><a href="mailto:' + esc(s.email) + '">' + esc(s.email) + "</a></p>" + facts(s);
 
     if (!rep) {
-      render('<header class="band"><div class="band-mark">' + markSVG() + '</div><div class="wrap">' + topbar(s.code, month) +
+      render('<header class="band"><div class="band-mark">' + markSVG(4) + '</div><div class="wrap">' + topbar(s.code, month) +
         '<div class="hero"><div class="identity">' + id + "</div></div></div></header>" +
         '<main class="body"><div class="wrap"><div class="empty"><h2>No report for ' + monthLabel(month) + "</h2>" +
         "<p>This store hasn’t received a Kano Model report for this cycle yet. Pick another month from the menu above.</p></div></div></main>" + footer(), bindMonth);
@@ -337,21 +365,21 @@
       '<div class="gauge-center"><div class="gauge-num">0<small>/100</small></div><div class="gauge-label">Kano Model score</div><div class="status">' + scoreStatus(rep.km) + "</div></div></div>" +
       '<div class="side-stats">' +
       (pm ? '<div class="stat"><div class="stat-label">Change in score</div><div class="score-delta">' + delta(rep.km, prev.km, pm, false) + "</div></div>" : "") +
-      '<div class="stat"><div class="stat-label">CCL score</div><div class="stat-num">' + esc(rep.ccl ?? "–") + "</div>" + (pm ? delta(rep.ccl, prev.ccl, pm, false) : "") + "</div>" +
-      '<div class="stat"><div class="stat-label">Points deducted</div><div class="stat-num">' + esc(rep.deducted ?? sumPts(rep.rows)) + "</div>" + (pm ? delta(rep.deducted, prev.deducted, pm, true) : "") + "</div>" +
+      '<div class="stat" style="--n:1"><div class="stat-label">CCL score</div><div class="stat-num" data-count="' + esc(rep.ccl ?? "") + '">' + esc(rep.ccl ?? "–") + "</div>" + (pm ? delta(rep.ccl, prev.ccl, pm, false) : "") + "</div>" +
+      '<div class="stat" style="--n:2"><div class="stat-label">Points deducted</div><div class="stat-num" data-count="' + esc(rep.deducted ?? sumPts(rep.rows)) + '">' + esc(rep.deducted ?? sumPts(rep.rows)) + "</div>" + (pm ? delta(rep.deducted, prev.deducted, pm, true) : "") + "</div>" +
       "</div></div>";
 
-    const panels = AUDITS.map((a) => {
+    const panels = AUDITS.map((a, n) => {
       const rows = auditRows(rep, a.key), errs = rows.filter(isError), pts = sumPts(rows);
       const prevPts = prev ? sumPts(auditRows(prev, a.key)) : null;
-      return '<a class="audit-panel" href="#/s/' + s.code + "/" + month + "/" + a.key + '"><h3>' + a.name + "</h3>" +
-        '<div class="audit-points">' + pts + '</div><div class="audit-points-label">' + (pts === 1 ? "point" : "points") + " deducted</div>" +
+      return '<a class="audit-panel reveal" style="--d:' + (700 + n * 120) + 'ms" href="#/s/' + s.code + "/" + month + "/" + a.key + '"><h3>' + a.name + "</h3>" +
+        '<div class="audit-points" data-count="' + pts + '">' + pts + '</div><div class="audit-points-label">' + (pts === 1 ? "point" : "points") + " deducted</div>" +
         '<div class="audit-foot"><span>' + plural(errs.length, "observation") + (prev ? ", " + monthLabel(pm, true) + ": " + plural(prevPts, "point") : "") + "</span>" +
         '<span class="audit-open">View details ' + ICON.arrow + "</span></div></a>";
     }).join("");
 
     render(
-      '<header class="band"><div class="band-mark">' + markSVG() + '</div><div class="wrap">' + topbar(s.code, month) +
+      '<header class="band"><div class="band-mark">' + markSVG(4) + '</div><div class="wrap">' + topbar(s.code, month) +
       '<div class="hero"><div class="identity">' + id + "</div>" + score + "</div></div></header>" +
       '<main class="body"><div class="wrap">' +
       '<section class="section"><div class="section-head"><h2>Audits</h2><p class="section-note">' +
@@ -415,9 +443,9 @@
     return '<section class="section"><div class="section-head"><h2>Compared with ' + monthLabel(pm) + "</h2>" +
       '<p class="section-note">Points deducted in each cycle.</p></div>' +
       '<div class="compare">' +
-      '<div class="card"><h3>By audit</h3><p class="hint">Where the points were lost.</p>' + legend + barRows(byAudit, max) + "</div>" +
-      '<div class="card"><h3>By attribute</h3><p class="hint">What the points were lost on.</p>' + legend + (byAttr.length ? barRows(byAttr, max) : '<p class="empty-note">No points deducted in either month.</p>') + "</div>" +
-      '<div class="card" style="grid-column:1/-1"><h3>Repeated from last month</h3><p class="hint">' +
+      '<div class="card reveal" style="--d:900ms"><h3>By audit</h3><p class="hint">Where the points were lost.</p>' + legend + barRows(byAudit, max) + "</div>" +
+      '<div class="card reveal" style="--d:1000ms"><h3>By attribute</h3><p class="hint">What the points were lost on.</p>' + legend + (byAttr.length ? barRows(byAttr, max) : '<p class="empty-note">No points deducted in either month.</p>') + "</div>" +
+      '<div class="card reveal" style="grid-column:1/-1;--d:1100ms"><h3>Repeated from last month</h3><p class="hint">' +
       (repeats.length ? plural(repeats.length, "observation") + " flagged in " + monthLabel(pm) + " showed up again." : "Issues that came back are listed here.") + "</p>" + repeatHTML + "</div>" +
       "</div></section>";
   }
@@ -487,9 +515,9 @@
         '<div data-cards' + (auditMode === "cards" ? "" : " hidden") + ">" +
         (errs.length ? '<div class="obs-list">' + errs.map((r, i) => obsCard(r, i, repeatSet)).join("") + "</div>" : '<p class="empty-note">No errors found in this audit.</p>') +
         (checks.length ? '<div class="section-head" style="margin-top:2.4rem"><h2 style="font:500 1.4rem/1.2 var(--display);margin:0">Other checks</h2><p class="section-note">Recorded with no points deducted.</p></div>' +
-          '<ul class="checks">' + checks.map((r) => {
+          '<ul class="checks">' + checks.map((r, n) => {
             const no = /^no$/i.test(r.i);
-            return '<li class="check"><span class="check-mark' + (no ? " no" : "") + '">' + (no ? ICON.cross : ICON.tick) + "</span><span>" + esc(r.p) +
+            return '<li class="check" style="--n:' + n + '"><span class="check-mark' + (no ? " no" : "") + '">' + (no ? ICON.cross : ICON.tick) + "</span><span>" + esc(r.p) +
               '<div class="check-input">' + esc(r.i || r.r) + "</div></span></li>";
           }).join("") + "</ul>" : "") +
         "</div>" +
@@ -503,14 +531,14 @@
     const prevPts = prev ? sumPts(prevRows) : null;
     const stats = rep
       ? '<div class="audit-stats">' +
-        '<div class="stat"><div class="stat-label">Points deducted</div><div class="stat-num">' + pts + "</div>" + (pm ? delta(pts, prevPts, pm, true) : "") + "</div>" +
-        '<div class="stat"><div class="stat-label">Errors by store</div><div class="stat-num">' + byStore + "</div></div>" +
+        '<div class="stat"><div class="stat-label">Points deducted</div><div class="stat-num" data-count="' + pts + '">' + pts + "</div>" + (pm ? delta(pts, prevPts, pm, true) : "") + "</div>" +
+        '<div class="stat"><div class="stat-label">Errors by store</div><div class="stat-num" data-count="' + byStore + '">' + byStore + "</div></div>" +
         (byOther ? '<div class="stat"><div class="stat-label">Errors by other teams</div><div class="stat-num">' + byOther + "</div></div>" : "") +
         '<div class="stat"><div class="stat-label">Kano Model score</div><div class="stat-num" style="color:' + scoreColor(rep.km) + '">' + esc(rep.km) + "</div></div></div>"
       : "";
 
     render(
-      '<header class="band"><div class="band-mark">' + markSVG() + '</div><div class="wrap">' + topbar(s.code, month, key) +
+      '<header class="band"><div class="band-mark">' + markSVG(4) + '</div><div class="wrap">' + topbar(s.code, month, key) +
       '<div class="audit-hero"><p class="crumb"><a href="#/">All stores</a> &nbsp;/&nbsp; <a href="#/s/' + s.code + "/" + month + '">' + esc(s.name) + " (" + esc(s.code) + ")</a> &nbsp;/&nbsp; " + monthLabel(month) + "</p>" +
       '<h1 class="audit-title">' + a.name + "</h1>" + stats + tabs + "</div></div></header>" +
       '<main class="body"><div class="wrap">' + body + '<div style="margin-top:3rem">' + concern() + "</div></div></main>" + footer(),
