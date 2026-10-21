@@ -616,3 +616,5 @@ table.km tr:last-child td { border-bottom: 0; }
 .gauge-num { font-size: 4.2rem; }
 .gauge-num small { font-weight: 400; letter-spacing: 0; }
 @media (max-width: 640px) { .gauge-num { font-size: 3.6rem; } }
+
+.stat-prev { font-size: .88rem; color: var(--band-muted); margin-top: .2rem; }

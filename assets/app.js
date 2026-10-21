@@ -139,10 +139,66 @@
     const step = (now) => {
       const p = Math.max(0, Math.min(1, (now - start) / dur));
       set(target * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) requestAnimationFrame(step); else el.classList.add("done");
+      if (p < 1) requestAnimationFrame(step); else { el.classList.add("done"); el.dispatchEvent(new Event("gaugedone")); }
     };
     set(0);
     requestAnimationFrame(step);
+  }
+
+  // Chip under last month's KM score: where the score stands now
+  function kmChange(cur, prev) {
+    if (cur == null || prev == null) return "";
+    const d = cur - prev;
+    if (d === 0) return '<span class="delta same">Same this month</span>';
+    return '<span class="delta ' + (d > 0 ? "good" : "bad") + '">' + (d > 0 ? ICON.up : ICON.down) +
+      (d > 0 ? "Up " : "Down ") + Math.abs(d) + " to " + cur + "</span>";
+  }
+
+  // ---------- Confetti for 95 and above ----------
+  const CELEBRATE_AT = 95;
+  function confetti(fromEl) {
+    if (reduceMotion) return;
+    const r = fromEl.getBoundingClientRect();
+    const ox = r.left + r.width / 2, oy = r.top + r.height / 2;
+    const cv = document.createElement("canvas");
+    cv.setAttribute("aria-hidden", "true");
+    cv.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60";
+    document.body.appendChild(cv);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+    const ctx = cv.getContext("2d");
+    ctx.scale(dpr, dpr);
+    const colors = ["#8E3393", "#A24BA2", "#C27FCB", "#E3C3EC", "#D8B35E", "#F1D894"];
+    const parts = Array.from({ length: 80 }, () => {
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.3, v = 6 + Math.random() * 7;
+      return {
+        x: ox, y: oy, vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+        size: 4 + Math.random() * 5, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3,
+        shape: Math.random() < 0.55 ? "gem" : Math.random() < 0.5 ? "dot" : "strip",
+        color: colors[(Math.random() * colors.length) | 0],
+      };
+    });
+    const start = performance.now(), life = 2600;
+    const draw = (now) => {
+      const t = now - start;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      ctx.globalAlpha = Math.max(0, 1 - Math.max(0, t - life * 0.55) / (life * 0.45));
+      parts.forEach((p) => {
+        p.vy += 0.22; p.vx *= 0.985; p.vy *= 0.985;
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.fillStyle = p.color;
+        if (p.shape === "gem") {
+          ctx.beginPath(); ctx.moveTo(0, -p.size); ctx.lineTo(p.size * 0.7, 0); ctx.lineTo(0, p.size); ctx.lineTo(-p.size * 0.7, 0); ctx.fill();
+        } else if (p.shape === "dot") {
+          ctx.beginPath(); ctx.arc(0, 0, p.size * 0.4, 0, Math.PI * 2); ctx.fill();
+        } else {
+          ctx.fillRect(-p.size * 0.6, -p.size * 0.2, p.size * 1.2, p.size * 0.4 * Math.abs(Math.cos(p.rot * 2)) + 1);
+        }
+        ctx.restore();
+      });
+      if (t < life) requestAnimationFrame(draw); else cv.remove();
+    };
+    requestAnimationFrame(draw);
   }
 
   // ---------- Light / dark ----------
@@ -364,9 +420,9 @@
       '<div class="scorecard"><div class="gauge" role="img" aria-label="Kano Model score ' + esc(rep.km) + ' out of 100" style="--score-color:' + mix(scoreColor(rep.km), "#1A0610", .35) + '">' + gaugeSVG(scoreColor(rep.km)) +
       '<div class="gauge-center"><div class="gauge-num">0<small>/100</small></div><div class="gauge-label">Kano Model score</div><div class="status">' + scoreStatus(rep.km) + "</div></div></div>" +
       '<div class="side-stats">' +
-      (pm ? '<div class="stat"><div class="stat-label">Change in score</div><div class="score-delta">' + delta(rep.km, prev.km, pm, false) + "</div></div>" : "") +
+      (pm ? '<div class="stat"><div class="stat-label">KM score, ' + monthLabel(pm) + '</div><div class="stat-num" style="color:' + scoreColor(prev.km) + '" data-count="' + esc(prev.km ?? "") + '">' + esc(prev.km ?? "–") + "</div>" + kmChange(rep.km, prev.km) + "</div>" : "") +
       '<div class="stat" style="--n:1"><div class="stat-label">CCL score</div><div class="stat-num" data-count="' + esc(rep.ccl ?? "") + '">' + esc(rep.ccl ?? "–") + "</div>" + (pm ? delta(rep.ccl, prev.ccl, pm, false) : "") + "</div>" +
-      '<div class="stat" style="--n:2"><div class="stat-label">Points deducted</div><div class="stat-num" data-count="' + esc(rep.deducted ?? sumPts(rep.rows)) + '">' + esc(rep.deducted ?? sumPts(rep.rows)) + "</div>" + (pm ? delta(rep.deducted, prev.deducted, pm, true) : "") + "</div>" +
+      '<div class="stat" style="--n:2"><div class="stat-label">Points deducted</div><div class="stat-num" data-count="' + esc(rep.deducted ?? sumPts(rep.rows)) + '">' + esc(rep.deducted ?? sumPts(rep.rows)) + "</div>" + (pm && prev.deducted != null ? '<div class="stat-prev">' + monthLabel(pm, true) + ": " + esc(prev.deducted) + "</div>" : "") + "</div>" +
       "</div></div>";
 
     const panels = AUDITS.map((a, n) => {
@@ -390,6 +446,7 @@
       () => {
         bindMonth();
         const g = app.querySelector(".gauge"), n = app.querySelector(".gauge-num");
+        if (Number(rep.km) >= CELEBRATE_AT) g.addEventListener("gaugedone", () => confetti(g), { once: true });
         animateGauge(g, rep.km);
         countUp(n, rep.km);
         requestAnimationFrame(() => setTimeout(() => app.querySelectorAll(".bar[data-w]").forEach((b) => { b.style.width = b.dataset.w + "%"; }), 120));
