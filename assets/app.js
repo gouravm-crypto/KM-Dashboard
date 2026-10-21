@@ -80,55 +80,75 @@
       (d > 0 ? "Up " : "Down ") + Math.abs(d) + vs + "</span>";
   }
 
-  // ---------- Faceted ring (echoes the CaratLane mark) ----------
-  function polar(cx, cy, r, deg) {
-    const a = (deg - 90) * Math.PI / 180;
-    return (cx + r * Math.cos(a)).toFixed(2) + "," + (cy + r * Math.sin(a)).toFixed(2);
-  }
-  function facet(cx, cy, r1, r2, mid, w1, w2, skew) {
-    return [polar(cx, cy, r1, mid - w1 / 2), polar(cx, cy, r2, mid - w2 / 2 + skew),
-      polar(cx, cy, r2, mid + w2 / 2 + skew), polar(cx, cy, r1, mid + w1 / 2)].join(" ");
-  }
-  function decorRing(gradId, from, to) {
-    let out = "", i = 0;
-    const rings = [
-      { n: 36, r1: 360, r2: 470, w1: 5, w2: 7.5, skew: 2, o: .3, off: 0 },
-      { n: 36, r1: 250, r2: 340, w1: 3.6, w2: 6, skew: -2, o: .22, off: 5 },
-      { n: 18, r1: 160, r2: 225, w1: 5, w2: 10, skew: 3, o: .16, off: 0 },
-    ];
-    rings.forEach((g) => {
-      for (let k = 0; k < g.n; k++) {
-        const mid = g.off + k * 360 / g.n;
-        out += '<polygon class="f" style="--i:' + (i++) + ";--o:" + g.o + '" points="' + facet(500, 500, g.r1, g.r2, mid, g.w1, g.w2, g.skew) + '"/>';
-      }
-    });
-    return '<svg viewBox="0 0 1000 1000" aria-hidden="true"><defs><linearGradient id="' + gradId +
-      '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + from + '"/><stop offset="1" stop-color="' + to +
-      '"/></linearGradient></defs>' + out + "</svg>";
-  }
-  function gaugeSVG() {
-    const N = 20;
+  // ---------- CaratLane "C" mark, traced from the logo (20 diamonds) ----------
+  const C_MARK = ["559.7,0 471.6,42.6 556.8,127.8 642,42.6", "556.8,176.1 491.5,241.5 562.5,272.7 622.2,241.5", "724.4,90.9 616.5,136.4 679,204.5 769.9,198.9", "821,116.5 821,235.8 940.3,238.6 911.9,147.7", "693.2,272.7 718.8,340.9 786.9,363.6 786.9,272.7", "786.9,636.4 718.8,659.1 693.2,730.1 784.1,730.1", "821,764.2 821,886.4 909.1,855.1 943.2,764.2", "676.1,798.3 616.5,866.5 724.4,911.9 769.9,804", "559.7,727.3 491.5,758.5 556.8,823.9 622.2,758.5", "554,875 471.6,960.2 559.7,1000 642,960.2", "343.8,801.1 389.2,911.9 497.2,866.5 437.5,798.3", "326.7,636.4 326.7,727.3 420.5,730.1 397.7,661.9", "170.5,764.2 201.7,852.3 292.6,886.4 292.6,764.2", "190.3,559.7 144.9,667.6 252.8,713.1 258.5,619.3", "298.3,434.7 233,500 298.3,565.3 329.5,502.8", "96.6,414.8 56.8,502.8 99.4,585.2 181.8,497.2", "255.7,286.9 147.7,332.4 190.3,440.3 261.4,377.8", "292.6,116.5 204.5,144.9 170.5,235.8 292.6,235.8", "329.5,272.7 329.5,363.6 394.9,340.9 420.5,272.7", "389.2,90.9 343.8,196 434.7,204.5 497.2,133.5"];
+  function markSVG() {
     let out = "";
-    for (let k = 0; k < N; k++) {
-      const mid = 9 + k * 360 / N;
-      out += '<polygon class="f" data-k="' + k + '" points="' + facet(120, 120, 88, 116, mid, 13.5, 16, 0) + '"/>';
-    }
-    return '<svg viewBox="0 0 240 240" aria-hidden="true"><defs><linearGradient id="gaugeFacet" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="#E7C8F0"/><stop offset=".55" stop-color="#B05BB4"/><stop offset="1" stop-color="#7A2C8F"/></linearGradient></defs>' +
-      out + '<circle cx="120" cy="120" r="80" fill="none" stroke="rgba(255,255,255,.08)"/></svg>';
-  }
-  function fillGauge(el, score) {
-    const facets = [...el.querySelectorAll(".f")];
-    const v = Math.max(0, Math.min(100, Number(score) || 0)) / 5;
-    const full = Math.floor(v), part = v - full > 0.001;
-    facets.forEach((f, k) => {
-      const t = reduceMotion ? 0 : 250 + k * 55;
-      setTimeout(() => {
-        if (k < full) f.classList.add("on");
-        else if (k === full && part) f.classList.add("part");
-      }, t);
+    C_MARK.forEach((pts, i) => {
+      const a = Math.random() * Math.PI * 2, d = 260 + Math.random() * 380;
+      out += '<polygon class="shard" style="--i:' + i + ";--dx:" + Math.round(Math.cos(a) * d) + "px;--dy:" + Math.round(Math.sin(a) * d) +
+        "px;--rot:" + Math.round(Math.random() * 360 - 180) + 'deg" points="' + pts + '"/>';
     });
+    return '<svg viewBox="0 0 1000 1000" aria-hidden="true">' + out + "</svg>";
   }
+
+  // ---------- Score colour: 80+ green (deeper toward 100), below 80 red (deeper toward 0) ----------
+  function mix(c1, c2, t) {
+    const h = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+    const a = h(c1), b = h(c2);
+    return "#" + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, "0")).join("");
+  }
+  function scoreColor(score) {
+    const v = Math.max(0, Math.min(100, Number(score) || 0));
+    if (v >= 80) return mix("#6CCB8F", "#178A4C", (v - 80) / 20);
+    return mix("#E8898B", "#9E0B1C", Math.min(1, (79 - v) / 69));
+  }
+  const scoreStatus = (v) => (v >= 80 ? "On track" : "Needs attention");
+
+  // ---------- Score ring (fills clockwise from 12 o'clock) ----------
+  const G = { c: 125, r: 104 };
+  function gaugeSVG(color) {
+    return '<svg viewBox="0 0 250 250" aria-hidden="true">' +
+      '<circle class="gauge-track" cx="125" cy="125" r="104" fill="none" stroke-width="14"/>' +
+      '<circle class="gauge-arc" cx="125" cy="125" r="104" fill="none" stroke="' + color + '" stroke-width="14" stroke-linecap="round" ' +
+      'transform="rotate(-90 125 125)" stroke-dasharray="0 999"/>' +
+      '<polygon class="gauge-gem" points="0,-11 8,0 0,11 -8,0" fill="' + color + '" stroke="var(--surface)" stroke-width="2.5" transform="translate(125 21)"/>' +
+      "</svg>";
+  }
+  function animateGauge(el, score) {
+    const arc = el.querySelector(".gauge-arc"), gem = el.querySelector(".gauge-gem");
+    const C = 2 * Math.PI * G.r, target = Math.max(0, Math.min(100, Number(score) || 0)) / 100;
+    const set = (t) => {
+      arc.setAttribute("stroke-dasharray", (C * t).toFixed(2) + " " + C.toFixed(2));
+      const ang = t * 2 * Math.PI;
+      gem.setAttribute("transform", "translate(" + (G.c + G.r * Math.sin(ang)).toFixed(2) + " " + (G.c - G.r * Math.cos(ang)).toFixed(2) + ") rotate(" + (t * 360).toFixed(1) + ")");
+    };
+    if (reduceMotion) { set(target); return; }
+    const start = performance.now() + 200, dur = 1400;
+    const step = (now) => {
+      const p = Math.max(0, Math.min(1, (now - start) / dur));
+      set(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    set(0);
+    requestAnimationFrame(step);
+  }
+
+  // ---------- Light / dark ----------
+  function themeBtn(extra) {
+    return '<button type="button" class="theme-toggle' + (extra ? " " + extra : "") + '" data-theme-toggle aria-label="Switch light or dark mode">' +
+      '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>' +
+      '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>';
+  }
+  function bindTheme() {
+    app.querySelectorAll("[data-theme-toggle]").forEach((b) => b.addEventListener("click", () => {
+      const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      try { localStorage.setItem("km-theme", next); } catch (e) { /* storage unavailable */ }
+    }));
+  }
+  const logos = (cls) => '<img class="' + cls + ' logo-light" src="assets/logo.png" alt="CaratLane, a Tata product"><img class="' + cls + ' logo-dark" src="assets/logo-white.png" alt="" aria-hidden="true">';
+
   function countUp(el, to) {
     if (to == null) { el.firstChild.nodeValue = "–"; return; }
     if (reduceMotion) { el.firstChild.nodeValue = to; return; }
@@ -234,6 +254,7 @@
   function render(html, after) {
     app.innerHTML = '<div class="view">' + html + "</div>";
     app.querySelectorAll("[data-search]").forEach(bindSearch);
+    bindTheme();
     window.scrollTo(0, 0);
     if (after) after();
   }
@@ -242,14 +263,13 @@
     document.title = "Kano Model store reports | CaratLane";
     const latest = MONTHS[0] ? "Latest cycle: " + monthLabel(MONTHS[0]) + ". " : "";
     render(
-      '<section class="home">' +
-      '<div class="home-ring">' + decorRing("homeFacet", "#C77BCB", "#5E2479") + "</div>" +
-      '<div class="home-inner">' +
-      '<img class="home-logo" src="assets/logo-white.png" alt="CaratLane, a Tata product">' +
+      '<section class="home">' + themeBtn("home-toggle") +
+      '<div class="home-mark">' + markSVG() + "</div>" +
+      '<div class="home-inner">' + logos("home-logo") +
       "<h1>Kano Model store reports</h1>" +
       '<p class="home-lede">Find your store to see this month’s score, every audit observation, and how it compares with last month.</p>' +
       searchHTML(false) +
-      '<p class="home-meta">' + latest + STORES.length + " stores. Press <kbd>/</kbd> to search.</p>" +
+      '<p class="home-meta">' + latest + STORES.length + ' stores.<span class="kbd-hint"> Press <kbd>/</kbd> to search.</span></p>' +
       "</div></section>",
       () => { const i = app.querySelector(".home input"); if (i && window.innerWidth > 640) setTimeout(() => i.focus({ preventScroll: true }), 1100); }
     );
@@ -257,10 +277,10 @@
 
   function topbar(code, month, audit) {
     const opts = MONTHS.map((m) => '<option value="' + m + '"' + (m === month ? " selected" : "") + ">" + monthLabel(m) + "</option>").join("");
-    return '<div class="topbar"><a href="#/" aria-label="All stores, back to search"><img class="topbar-logo" src="assets/logo-white.png" alt="CaratLane, a Tata product"></a>' +
+    return '<div class="topbar"><a href="#/" aria-label="All stores, back to search">' + logos("topbar-logo") + "</a>" +
       '<div class="topbar-tools">' + searchHTML(true) +
       (MONTHS.length ? '<label class="sr-only" for="monthSel">Report month</label><select id="monthSel" class="month-select" data-code="' + esc(code) + '" data-audit="' + (audit || "") + '">' + opts + "</select>" : "") +
-      "</div></div>";
+      themeBtn() + "</div></div>";
   }
   function bindMonth() {
     const sel = document.getElementById("monthSel");
@@ -275,7 +295,7 @@
   function concern() {
     return '<section class="section"><div class="concern"><p><strong>Something in this report doesn’t look right?</strong>' +
       "Tell the quality team which observation you’d like reviewed and why.</p>" +
-      '<a class="btn light" href="' + CONCERN_FORM + '" target="_blank" rel="noopener">Raise a concern ' + ICON.ext + "</a></div></section>";
+      '<a class="btn solid" href="' + CONCERN_FORM + '" target="_blank" rel="noopener">Raise a concern ' + ICON.ext + "</a></div></section>";
   }
   const footer = () => '<footer class="foot"><div class="wrap">Kano Model reports by the CaratLane quality team. Scores start at 100 and each observation can deduct points.</div></footer>';
 
@@ -304,7 +324,7 @@
       '<p class="ids"><span class="code">' + esc(s.code) + "</span><span>" + esc(s.erp) + '</span><a href="mailto:' + esc(s.email) + '">' + esc(s.email) + "</a></p>" + facts(s);
 
     if (!rep) {
-      render('<header class="band"><div class="band-ring">' + decorRing("bandFacet", "#B865BD", "#4A1F66") + '</div><div class="wrap">' + topbar(s.code, month) +
+      render('<header class="band"><div class="band-mark">' + markSVG() + '</div><div class="wrap">' + topbar(s.code, month) +
         '<div class="hero"><div class="identity">' + id + "</div></div></div></header>" +
         '<main class="body"><div class="wrap"><div class="empty"><h2>No report for ' + monthLabel(month) + "</h2>" +
         "<p>This store hasn’t received a Kano Model report for this cycle yet. Pick another month from the menu above.</p></div></div></main>" + footer(), bindMonth);
@@ -313,8 +333,8 @@
 
     const pm = prev ? prevMonth : null;
     const score =
-      '<div class="scorecard"><div class="gauge" role="img" aria-label="Kano Model score ' + esc(rep.km) + ' out of 100">' + gaugeSVG() +
-      '<div class="gauge-center"><div class="gauge-num" data-count="' + esc(rep.km) + '">0<small>/100</small></div><div class="gauge-label">Kano Model score</div></div></div>' +
+      '<div class="scorecard"><div class="gauge" role="img" aria-label="Kano Model score ' + esc(rep.km) + ' out of 100" style="--score-color:' + mix(scoreColor(rep.km), "#1A0610", .35) + '">' + gaugeSVG(scoreColor(rep.km)) +
+      '<div class="gauge-center"><div class="gauge-num">0<small>/100</small></div><div class="gauge-label">Kano Model score</div><div class="status">' + scoreStatus(rep.km) + "</div></div></div>" +
       '<div class="side-stats">' +
       (pm ? '<div class="stat"><div class="stat-label">Change in score</div><div class="score-delta">' + delta(rep.km, prev.km, pm, false) + "</div></div>" : "") +
       '<div class="stat"><div class="stat-label">CCL score</div><div class="stat-num">' + esc(rep.ccl ?? "–") + "</div>" + (pm ? delta(rep.ccl, prev.ccl, pm, false) : "") + "</div>" +
@@ -331,7 +351,7 @@
     }).join("");
 
     render(
-      '<header class="band"><div class="band-ring">' + decorRing("bandFacet", "#B865BD", "#4A1F66") + '</div><div class="wrap">' + topbar(s.code, month) +
+      '<header class="band"><div class="band-mark">' + markSVG() + '</div><div class="wrap">' + topbar(s.code, month) +
       '<div class="hero"><div class="identity">' + id + "</div>" + score + "</div></div></header>" +
       '<main class="body"><div class="wrap">' +
       '<section class="section"><div class="section-head"><h2>Audits</h2><p class="section-note">' +
@@ -342,7 +362,7 @@
       () => {
         bindMonth();
         const g = app.querySelector(".gauge"), n = app.querySelector(".gauge-num");
-        fillGauge(g, rep.km);
+        animateGauge(g, rep.km);
         countUp(n, rep.km);
         requestAnimationFrame(() => setTimeout(() => app.querySelectorAll(".bar[data-w]").forEach((b) => { b.style.width = b.dataset.w + "%"; }), 120));
       }
@@ -486,11 +506,11 @@
         '<div class="stat"><div class="stat-label">Points deducted</div><div class="stat-num">' + pts + "</div>" + (pm ? delta(pts, prevPts, pm, true) : "") + "</div>" +
         '<div class="stat"><div class="stat-label">Errors by store</div><div class="stat-num">' + byStore + "</div></div>" +
         (byOther ? '<div class="stat"><div class="stat-label">Errors by other teams</div><div class="stat-num">' + byOther + "</div></div>" : "") +
-        '<div class="stat"><div class="stat-label">Kano Model score</div><div class="stat-num">' + esc(rep.km) + "</div></div></div>"
+        '<div class="stat"><div class="stat-label">Kano Model score</div><div class="stat-num" style="color:' + scoreColor(rep.km) + '">' + esc(rep.km) + "</div></div></div>"
       : "";
 
     render(
-      '<header class="band"><div class="band-ring">' + decorRing("bandFacet", "#B865BD", "#4A1F66") + '</div><div class="wrap">' + topbar(s.code, month, key) +
+      '<header class="band"><div class="band-mark">' + markSVG() + '</div><div class="wrap">' + topbar(s.code, month, key) +
       '<div class="audit-hero"><p class="crumb"><a href="#/">All stores</a> &nbsp;/&nbsp; <a href="#/s/' + s.code + "/" + month + '">' + esc(s.name) + " (" + esc(s.code) + ")</a> &nbsp;/&nbsp; " + monthLabel(month) + "</p>" +
       '<h1 class="audit-title">' + a.name + "</h1>" + stats + tabs + "</div></div></header>" +
       '<main class="body"><div class="wrap">' + body + '<div style="margin-top:3rem">' + concern() + "</div></div></main>" + footer(),
