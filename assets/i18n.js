@@ -15,6 +15,9 @@ window.KM_I18N = {
   ],
   strings: {
     en: {
+      carried_title: "No audit this month", carried_note: "This store was not audited in {month}. Its score is carried forward from {from}.", see_month: "See the {month} report", ncf_note: "KM score is 0 because of an NCF in the {audit}.",
+      not_done: "Not done this month", audit_score: "Audit score", score_by_audit: "Score in each audit", score_by_audit_hint: "Out of 100. NA means the audit was not done.",
+      loading: "Loading the latest scores…",
       title_site: "KM Store Report | CaratLane",
       home_h1: "Your store’s KM score",
       home_lede: "Type your store name, store code or store email to see your score, the mistakes found and how to fix them.",
@@ -61,7 +64,7 @@ window.KM_I18N = {
       repeat_hint_none: "Mistakes that happen again will show here.",
       repeat_meta: "{audit} this month. Last month: {text}",
       repeat_none: "No mistake from {month} happened again. Well done!",
-      no_prev: "This is the first report for this store, so there is nothing to compare yet.",
+      no_prev: "There is no earlier report to compare with.",
       concern_q: "Think something in this report is wrong?",
       concern_p: "Tell the quality team which mistake you want them to check again, and why.",
       concern_btn: "Report a problem",
@@ -94,6 +97,9 @@ window.KM_I18N = {
     },
 
     hi: {
+      carried_title: "इस महीने कोई ऑडिट नहीं", carried_note: "{month} में इस स्टोर का ऑडिट नहीं हुआ। इसका स्कोर {from} से आगे लिया गया है।", see_month: "{month} की रिपोर्ट देखें", ncf_note: "{audit} में NCF होने की वजह से KM स्कोर 0 है।",
+      not_done: "इस महीने नहीं हुआ", audit_score: "ऑडिट स्कोर", score_by_audit: "हर ऑडिट का स्कोर", score_by_audit_hint: "100 में से। NA का मतलब ऑडिट नहीं हुआ।",
+      loading: "ताज़ा स्कोर लोड हो रहे हैं…",
       title_site: "KM स्टोर रिपोर्ट | CaratLane",
       home_h1: "आपके स्टोर का KM स्कोर",
       home_lede: "अपना स्कोर, मिली गलतियाँ और उन्हें ठीक करने का तरीका देखने के लिए अपने स्टोर का नाम, स्टोर कोड या स्टोर ईमेल लिखें।",
@@ -140,7 +146,7 @@ window.KM_I18N = {
       repeat_hint_none: "जो गलतियाँ दोबारा होंगी, वे यहाँ दिखेंगी।",
       repeat_meta: "इस महीने {audit} में। पिछले महीने: {text}",
       repeat_none: "{month} की कोई भी गलती दोबारा नहीं हुई। बहुत बढ़िया!",
-      no_prev: "यह इस स्टोर की पहली रिपोर्ट है, इसलिए अभी तुलना के लिए कुछ नहीं है।",
+      no_prev: "तुलना के लिए इससे पहले की कोई रिपोर्ट नहीं है।",
       concern_q: "क्या आपको लगता है कि इस रिपोर्ट में कुछ गलत है?",
       concern_p: "क्वालिटी टीम को बताएँ कि आप कौन-सी गलती दोबारा जँचवाना चाहते हैं और क्यों।",
       concern_btn: "समस्या बताएँ",
@@ -173,6 +179,9 @@ window.KM_I18N = {
     },
 
     bn: {
+      carried_title: "এই মাসে কোনো অডিট নেই", carried_note: "{month}-এ এই স্টোরের অডিট হয়নি। এর স্কোর {from} থেকে নেওয়া হয়েছে।", see_month: "{month}-এর রিপোর্ট দেখুন", ncf_note: "{audit}-এ NCF থাকায় KM স্কোর 0।",
+      not_done: "এই মাসে হয়নি", audit_score: "অডিট স্কোর", score_by_audit: "প্রতিটি অডিটের স্কোর", score_by_audit_hint: "100-এর মধ্যে। NA মানে অডিট হয়নি।",
+      loading: "সর্বশেষ স্কোর লোড হচ্ছে…",
       title_site: "KM স্টোর রিপোর্ট | CaratLane",
       home_h1: "আপনার স্টোরের KM স্কোর",
       home_lede: "আপনার স্কোর, পাওয়া ভুলগুলো এবং সেগুলো কীভাবে ঠিক করবেন তা দেখতে আপনার স্টোরের নাম, স্টোর কোড বা স্টোর ইমেল লিখুন।",
@@ -218,7 +227,7 @@ window.KM_I18N = {
       repeat_hint_none: "যে ভুলগুলো আবার হবে, সেগুলো এখানে দেখা যাবে।",
       repeat_meta: "এই মাসে {audit}-এ। গত মাসে: {text}",
       repeat_none: "{month}-এর কোনো ভুল আবার হয়নি। খুব ভালো!",
-      no_prev: "এটি এই স্টোরের প্রথম রিপোর্ট, তাই এখনো তুলনা করার কিছু নেই।",
+      no_prev: "তুলনা করার জন্য এর আগের কোনো রিপোর্ট নেই।",
       concern_q: "এই রিপোর্টে কিছু ভুল আছে বলে মনে হচ্ছে?",
       concern_p: "কোন ভুলটি আবার দেখাতে চান এবং কেন, তা কোয়ালিটি টিমকে জানান।",
       concern_btn: "সমস্যা জানান",
@@ -251,6 +260,9 @@ window.KM_I18N = {
     },
 
     mr: {
+      carried_title: "या महिन्यात ऑडिट नाही", carried_note: "{month} मध्ये या स्टोअरचे ऑडिट झाले नाही. याचा स्कोअर {from} पासून पुढे घेतला आहे.", see_month: "{month} चा रिपोर्ट पाहा", ncf_note: "{audit} मध्ये NCF असल्यामुळे KM स्कोअर 0 आहे.",
+      not_done: "या महिन्यात झाले नाही", audit_score: "ऑडिट स्कोअर", score_by_audit: "प्रत्येक ऑडिटचा स्कोअर", score_by_audit_hint: "100 पैकी. NA म्हणजे ऑडिट झाले नाही.",
+      loading: "नवीन स्कोअर लोड होत आहेत…",
       title_site: "KM स्टोअर रिपोर्ट | CaratLane",
       home_h1: "तुमच्या स्टोअरचा KM स्कोअर",
       home_lede: "तुमचा स्कोअर, सापडलेल्या चुका आणि त्या कशा दुरुस्त करायच्या हे पाहण्यासाठी तुमच्या स्टोअरचे नाव, स्टोअर कोड किंवा स्टोअर ईमेल लिहा.",
@@ -297,7 +309,7 @@ window.KM_I18N = {
       repeat_hint_none: "ज्या चुका पुन्हा होतील त्या इथे दिसतील.",
       repeat_meta: "या महिन्यात {audit} मध्ये. मागील महिन्यात: {text}",
       repeat_none: "{month} मधील कोणतीही चूक पुन्हा झाली नाही. छान!",
-      no_prev: "हा या स्टोअरचा पहिला रिपोर्ट आहे, त्यामुळे अजून तुलना करण्यासारखे काही नाही.",
+      no_prev: "तुलना करण्यासाठी याआधीचा कोणताही रिपोर्ट नाही.",
       concern_q: "या रिपोर्टमध्ये काही चूक आहे असे वाटते?",
       concern_p: "कोणती चूक पुन्हा तपासायची आहे आणि का, हे क्वालिटी टीमला सांगा.",
       concern_btn: "तक्रार नोंदवा",
@@ -330,6 +342,9 @@ window.KM_I18N = {
     },
 
     te: {
+      carried_title: "ఈ నెల ఆడిట్ లేదు", carried_note: "{month} లో ఈ స్టోర్ ఆడిట్ జరగలేదు. దీని స్కోర్ {from} నుండి కొనసాగించబడింది.", see_month: "{month} రిపోర్ట్ చూడండి", ncf_note: "{audit} లో NCF ఉన్నందున KM స్కోర్ 0.",
+      not_done: "ఈ నెల జరగలేదు", audit_score: "ఆడిట్ స్కోర్", score_by_audit: "ప్రతి ఆడిట్ స్కోర్", score_by_audit_hint: "100 కి. NA అంటే ఆడిట్ జరగలేదు.",
+      loading: "తాజా స్కోర్లు లోడ్ అవుతున్నాయి…",
       title_site: "KM స్టోర్ రిపోర్ట్ | CaratLane",
       home_h1: "మీ స్టోర్ KM స్కోర్",
       home_lede: "మీ స్కోర్, దొరికిన తప్పులు, వాటిని ఎలా సరిచేయాలో చూడటానికి మీ స్టోర్ పేరు, స్టోర్ కోడ్ లేదా స్టోర్ ఈమెయిల్ టైప్ చేయండి.",
@@ -376,7 +391,7 @@ window.KM_I18N = {
       repeat_hint_none: "మళ్లీ జరిగే తప్పులు ఇక్కడ కనిపిస్తాయి.",
       repeat_meta: "ఈ నెల {audit} లో. గత నెల: {text}",
       repeat_none: "{month} లోని ఏ తప్పూ మళ్లీ జరగలేదు. చాలా బాగుంది!",
-      no_prev: "ఇది ఈ స్టోర్ మొదటి రిపోర్ట్, కాబట్టి ఇంకా పోల్చడానికి ఏమీ లేదు.",
+      no_prev: "పోల్చడానికి ఇంతకు ముందు రిపోర్ట్ ఏదీ లేదు.",
       concern_q: "ఈ రిపోర్ట్‌లో ఏదైనా తప్పు ఉందని అనిపిస్తోందా?",
       concern_p: "ఏ తప్పును మళ్లీ చెక్ చేయాలో, ఎందుకో క్వాలిటీ టీమ్‌కు చెప్పండి.",
       concern_btn: "సమస్యను తెలియజేయండి",
@@ -409,6 +424,9 @@ window.KM_I18N = {
     },
 
     ta: {
+      carried_title: "இந்த மாதம் ஆடிட் இல்லை", carried_note: "{month} இல் இந்த ஸ்டோருக்கு ஆடிட் நடக்கவில்லை. இதன் ஸ்கோர் {from} இலிருந்து தொடர்கிறது.", see_month: "{month} ரிப்போர்ட்டைப் பாருங்கள்", ncf_note: "{audit} இல் NCF இருப்பதால் KM ஸ்கோர் 0.",
+      not_done: "இந்த மாதம் நடக்கவில்லை", audit_score: "ஆடிட் ஸ்கோர்", score_by_audit: "ஒவ்வொரு ஆடிட்டின் ஸ்கோர்", score_by_audit_hint: "100-க்கு. NA என்றால் ஆடிட் நடக்கவில்லை.",
+      loading: "சமீபத்திய ஸ்கோர்கள் ஏற்றப்படுகின்றன…",
       title_site: "KM ஸ்டோர் ரிப்போர்ட் | CaratLane",
       home_h1: "உங்கள் ஸ்டோரின் KM ஸ்கோர்",
       home_lede: "உங்கள் ஸ்கோர், கண்டறியப்பட்ட தவறுகள், அவற்றை எப்படிச் சரிசெய்வது ஆகியவற்றைப் பார்க்க உங்கள் ஸ்டோர் பெயர், ஸ்டோர் கோட் அல்லது ஸ்டோர் இமெயிலை டைப் செய்யுங்கள்.",
@@ -455,7 +473,7 @@ window.KM_I18N = {
       repeat_hint_none: "மீண்டும் நடக்கும் தவறுகள் இங்கே தெரியும்.",
       repeat_meta: "இந்த மாதம் {audit} இல். கடந்த மாதம்: {text}",
       repeat_none: "{month} இல் நடந்த எந்தத் தவறும் மீண்டும் நடக்கவில்லை. மிகவும் நன்று!",
-      no_prev: "இது இந்த ஸ்டோரின் முதல் ரிப்போர்ட், அதனால் இப்போது ஒப்பிட எதுவும் இல்லை.",
+      no_prev: "ஒப்பிடுவதற்கு இதற்கு முந்தைய ரிப்போர்ட் எதுவும் இல்லை.",
       concern_q: "இந்த ரிப்போர்ட்டில் ஏதாவது தவறு இருப்பதாக நினைக்கிறீர்களா?",
       concern_p: "எந்தத் தவறை மீண்டும் சரிபார்க்க வேண்டும், ஏன் என்று குவாலிட்டி டீமிடம் சொல்லுங்கள்.",
       concern_btn: "பிரச்சனையைத் தெரிவியுங்கள்",
@@ -488,6 +506,9 @@ window.KM_I18N = {
     },
 
     gu: {
+      carried_title: "આ મહિને કોઈ ઓડિટ નથી", carried_note: "{month} માં આ સ્ટોરનું ઓડિટ થયું નથી. તેનો સ્કોર {from} થી આગળ લેવામાં આવ્યો છે.", see_month: "{month} નો રિપોર્ટ જુઓ", ncf_note: "{audit} માં NCF હોવાથી KM સ્કોર 0 છે.",
+      not_done: "આ મહિને થયું નથી", audit_score: "ઓડિટ સ્કોર", score_by_audit: "દરેક ઓડિટનો સ્કોર", score_by_audit_hint: "100 માંથી. NA એટલે ઓડિટ થયું નથી.",
+      loading: "તાજા સ્કોર લોડ થઈ રહ્યા છે…",
       title_site: "KM સ્ટોર રિપોર્ટ | CaratLane",
       home_h1: "તમારા સ્ટોરનો KM સ્કોર",
       home_lede: "તમારો સ્કોર, મળેલી ભૂલો અને તેને કેવી રીતે સુધારવી તે જોવા માટે તમારા સ્ટોરનું નામ, સ્ટોર કોડ અથવા સ્ટોર ઈમેલ લખો.",
@@ -534,7 +555,7 @@ window.KM_I18N = {
       repeat_hint_none: "જે ભૂલો ફરી થશે તે અહીં દેખાશે.",
       repeat_meta: "આ મહિને {audit} માં. ગયા મહિને: {text}",
       repeat_none: "{month} ની કોઈ ભૂલ ફરી થઈ નથી. ખૂબ સરસ!",
-      no_prev: "આ સ્ટોરનો આ પહેલો રિપોર્ટ છે, તેથી હજી સરખામણી માટે કંઈ નથી.",
+      no_prev: "સરખામણી માટે આ પહેલાંનો કોઈ રિપોર્ટ નથી.",
       concern_q: "શું તમને લાગે છે કે આ રિપોર્ટમાં કંઈક ખોટું છે?",
       concern_p: "કઈ ભૂલ ફરીથી તપાસવી છે અને કેમ, તે ક્વોલિટી ટીમને જણાવો.",
       concern_btn: "સમસ્યા જણાવો",
@@ -567,6 +588,9 @@ window.KM_I18N = {
     },
 
     kn: {
+      carried_title: "ಈ ತಿಂಗಳು ಆಡಿಟ್ ಇಲ್ಲ", carried_note: "{month} ನಲ್ಲಿ ಈ ಸ್ಟೋರ್‌ನ ಆಡಿಟ್ ನಡೆದಿಲ್ಲ. ಇದರ ಸ್ಕೋರ್ ಅನ್ನು {from} ನಿಂದ ಮುಂದುವರಿಸಲಾಗಿದೆ.", see_month: "{month} ವರದಿ ನೋಡಿ", ncf_note: "{audit} ನಲ್ಲಿ NCF ಇರುವುದರಿಂದ KM ಸ್ಕೋರ್ 0.",
+      not_done: "ಈ ತಿಂಗಳು ನಡೆದಿಲ್ಲ", audit_score: "ಆಡಿಟ್ ಸ್ಕೋರ್", score_by_audit: "ಪ್ರತಿ ಆಡಿಟ್‌ನ ಸ್ಕೋರ್", score_by_audit_hint: "100 ರಲ್ಲಿ. NA ಎಂದರೆ ಆಡಿಟ್ ನಡೆದಿಲ್ಲ.",
+      loading: "ಇತ್ತೀಚಿನ ಸ್ಕೋರ್‌ಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ…",
       title_site: "KM ಸ್ಟೋರ್ ವರದಿ | CaratLane",
       home_h1: "ನಿಮ್ಮ ಸ್ಟೋರ್‌ನ KM ಸ್ಕೋರ್",
       home_lede: "ನಿಮ್ಮ ಸ್ಕೋರ್, ಕಂಡುಬಂದ ತಪ್ಪುಗಳು ಮತ್ತು ಅವುಗಳನ್ನು ಹೇಗೆ ಸರಿಪಡಿಸುವುದು ಎಂದು ನೋಡಲು ನಿಮ್ಮ ಸ್ಟೋರ್ ಹೆಸರು, ಸ್ಟೋರ್ ಕೋಡ್ ಅಥವಾ ಸ್ಟೋರ್ ಇಮೇಲ್ ಟೈಪ್ ಮಾಡಿ.",
@@ -613,7 +637,7 @@ window.KM_I18N = {
       repeat_hint_none: "ಮತ್ತೆ ಆಗುವ ತಪ್ಪುಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.",
       repeat_meta: "ಈ ತಿಂಗಳು {audit} ನಲ್ಲಿ. ಕಳೆದ ತಿಂಗಳು: {text}",
       repeat_none: "{month} ನ ಯಾವ ತಪ್ಪೂ ಮತ್ತೆ ಆಗಿಲ್ಲ. ತುಂಬಾ ಚೆನ್ನಾಗಿದೆ!",
-      no_prev: "ಇದು ಈ ಸ್ಟೋರ್‌ನ ಮೊದಲ ವರದಿ, ಆದ್ದರಿಂದ ಇನ್ನೂ ಹೋಲಿಸಲು ಏನೂ ಇಲ್ಲ.",
+      no_prev: "ಹೋಲಿಸಲು ಇದಕ್ಕಿಂತ ಹಿಂದಿನ ಯಾವುದೇ ವರದಿ ಇಲ್ಲ.",
       concern_q: "ಈ ವರದಿಯಲ್ಲಿ ಏನಾದರೂ ತಪ್ಪಿದೆ ಎನಿಸುತ್ತಿದೆಯೇ?",
       concern_p: "ಯಾವ ತಪ್ಪನ್ನು ಮತ್ತೆ ಪರಿಶೀಲಿಸಬೇಕು ಮತ್ತು ಏಕೆ ಎಂದು ಕ್ವಾಲಿಟಿ ಟೀಮ್‌ಗೆ ತಿಳಿಸಿ.",
       concern_btn: "ಸಮಸ್ಯೆ ತಿಳಿಸಿ",
@@ -646,6 +670,9 @@ window.KM_I18N = {
     },
 
     ml: {
+      carried_title: "ഈ മാസം ഓഡിറ്റ് ഇല്ല", carried_note: "{month}-ൽ ഈ സ്റ്റോറിന്റെ ഓഡിറ്റ് നടന്നില്ല. ഇതിന്റെ സ്കോർ {from}-ൽ നിന്ന് തുടരുന്നു.", see_month: "{month} റിപ്പോർട്ട് കാണുക", ncf_note: "{audit}-ൽ NCF ഉള്ളതിനാൽ KM സ്കോർ 0 ആണ്.",
+      not_done: "ഈ മാസം നടന്നില്ല", audit_score: "ഓഡിറ്റ് സ്കോർ", score_by_audit: "ഓരോ ഓഡിറ്റിന്റെയും സ്കോർ", score_by_audit_hint: "100-ൽ. NA എന്നാൽ ഓഡിറ്റ് നടന്നില്ല.",
+      loading: "പുതിയ സ്കോറുകൾ ലോഡ് ചെയ്യുന്നു…",
       title_site: "KM സ്റ്റോർ റിപ്പോർട്ട് | CaratLane",
       home_h1: "നിങ്ങളുടെ സ്റ്റോറിന്റെ KM സ്കോർ",
       home_lede: "നിങ്ങളുടെ സ്കോർ, കണ്ടെത്തിയ തെറ്റുകൾ, അവ എങ്ങനെ ശരിയാക്കാം എന്നിവ കാണാൻ നിങ്ങളുടെ സ്റ്റോറിന്റെ പേര്, സ്റ്റോർ കോഡ് അല്ലെങ്കിൽ സ്റ്റോർ ഇമെയിൽ ടൈപ്പ് ചെയ്യുക.",
@@ -692,7 +719,7 @@ window.KM_I18N = {
       repeat_hint_none: "വീണ്ടും സംഭവിക്കുന്ന തെറ്റുകൾ ഇവിടെ കാണാം.",
       repeat_meta: "ഈ മാസം {audit}-ൽ. കഴിഞ്ഞ മാസം: {text}",
       repeat_none: "{month}-ലെ ഒരു തെറ്റും വീണ്ടും സംഭവിച്ചില്ല. വളരെ നല്ലത്!",
-      no_prev: "ഇത് ഈ സ്റ്റോറിന്റെ ആദ്യ റിപ്പോർട്ടാണ്, അതിനാൽ ഇപ്പോൾ താരതമ്യം ചെയ്യാൻ ഒന്നുമില്ല.",
+      no_prev: "താരതമ്യം ചെയ്യാൻ ഇതിനു മുമ്പുള്ള റിപ്പോർട്ട് ഒന്നുമില്ല.",
       concern_q: "ഈ റിപ്പോർട്ടിൽ എന്തെങ്കിലും തെറ്റുണ്ടെന്ന് തോന്നുന്നുണ്ടോ?",
       concern_p: "ഏത് തെറ്റാണ് വീണ്ടും പരിശോധിക്കേണ്ടത്, എന്തുകൊണ്ട് എന്ന് ക്വാളിറ്റി ടീമിനെ അറിയിക്കുക.",
       concern_btn: "പ്രശ്നം അറിയിക്കുക",

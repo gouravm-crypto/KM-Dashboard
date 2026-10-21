@@ -1,43 +1,71 @@
 # CaratLane Kano Model dashboard
 
-Stores search by name, code or email and see their monthly Kano Model report:
-score, CCL score, points deducted, every PPT / Video call / CCTV observation,
-and a comparison with the previous month.
+Stores search by name, code or email and see their monthly KM report: score,
+points lost, every PPT / Video call / CCTV mistake with how to fix it,
+and a comparison with their previous audit. Available in 9 languages.
 
 ## Publish on GitHub Pages
-1. Create a repository and upload everything in this folder (keep the folder structure).
-2. Repo **Settings → Pages → Build and deployment**: Source "Deploy from a branch", branch `main`, folder `/ (root)`. Save.
-3. After a minute the site is live at `https://<your-username>.github.io/<repo-name>/`.
+1. Upload everything in this folder to a GitHub repository (keep the folders).
+2. Repo **Settings > Pages**: Source "Deploy from a branch", branch `main`, folder `/ (root)`. Save.
+3. The site is live at `https://<your-username>.github.io/<repo-name>/` after a minute.
 
-Direct links work too, so you can send each store its own page:
-- Store overview: `.../#/s/CFMYSNXM`
-- A specific month: `.../#/s/CFMYSNXM/2026-10`
-- An audit: `.../#/s/CFMYSNXM/2026-10/vc` (`ppt`, `vc` or `cctv`)
+Direct links work, so each store can get its own page:
+- Store: `.../#/s/CFMYSNXM`   Month: `.../#/s/CFMYSNXM/2026-10`   Audit: `.../#/s/CFMYSNXM/2026-10/vc`
 
-## Adding a new month
-1. Create a folder in `source/` named `YYYY-MM` (e.g. `source/2026-11`).
-2. Add two CSV files with the same headers as the existing months:
-   - `summary.csv`: one row per store (score, CCL score, points deducted, VC link, CCTV details, date sent).
-   - `observations.csv`: one row per observation, same columns as the email table plus `Store Code`.
-3. Run `pip install pandas openpyxl` once, then `python tools/build_data.py` from the repo root.
-4. Commit the updated `data/` folder. The new month appears in the month menu automatically
-   and becomes the default; the previous month is used for comparison.
+## Connect the Google Sheet (live updates)
+1. In the Google Sheet: **File > Share > Publish to web**.
+2. Under "Link", choose **Sheet1** and **Comma-separated values (.csv)**, click **Publish**, and copy the link.
+3. Paste the link into `sheetCsvUrl` in `assets/config.js` (already done for the current sheet).
 
-The script warns if a store code isn't in `store_details.xlsx`, or if the observation
-points don't add up to the summary's "Points Deducted".
+From then on, anything added to the sheet shows on the dashboard within about 5 minutes
+(Google refreshes published sheets on its own schedule). New months appear automatically.
 
-To update the store list, replace `source/store_details.xlsx` and run the script again.
+**Months shown:** only the latest 3 audit cycles (set by `monthsToShow` in `assets/config.js`).
+The window moves by itself: once November rows are in the sheet, the dashboard shows Sep, Oct, Nov.
+The oldest month shown has no "compared with last month" section. Older months stay in the sheet,
+just not on the dashboard. Set `monthsToShow` to 0 to show every month.
 
-## Files
-- `index.html`, `assets/` — the site (styles, logic, logos).
-- `data/` — generated files the site reads. Don't edit by hand.
-- `source/` — your inputs. `tools/build_data.py` turns them into `data/`.
-- To change the "Raise a concern" form link, edit `CONCERN_FORM` at the top of `assets/app.js`.
+**Keep the column headings as they are.** Adding rows is always fine. Renaming a heading
+can stop that column from showing.
+
+How the sheet is read:
+- Month = "Audit Cycle" if filled, otherwise the month of "Date of Audit".
+- Points: Error -1, Critical Error (CE) -10, NCF -100 (as entered in "Ponts Deducted", column Z).
+- KM score = 100 minus all points lost that month across PPT, Video call and CCTV (never below 0).
+  This is the same calculation as the monthly KM email.
+- Any NCF in any audit that month makes the KM score 0 (and so CCL 0). The page says which audit had the NCF.
+- CCL points come from the KM score: 100 = 15, 95-99 = 14, 90-94 = 13, 85-89 = 12, 80-84 = 11,
+  70-79 = 10, 60-69 = 5, below 60 = 0.
+- An audit with no rows in a month the store was audited shows as NA ("Not done this month").
+- A store with no audit at all in a month keeps its last score: the page shows "No audit this month"
+  and the score carried forward from its last audited month.
+- Repeated heading rows and rows without a store code are skipped.
+- Video call link: taken from the VC rows. CCTV date/times: taken from the CCTV rows.
+
+## Overriding a score (optional, rarely needed)
+If a score ever needs to differ from the calculation (e.g. after a concern is accepted), add a tab with
+`Store Code | Audit Cycle | KM Score` (and/or `CCL Score`), publish that tab as CSV the same way,
+and paste its link into `scoresCsvUrl` in `assets/config.js`.
+
+## Backup data
+If the live link is empty or Google can't be reached, the dashboard uses the saved data in `data/`.
+To refresh the backup (e.g. once a month):
+1. In the sheet: **File > Download > Microsoft Excel (.xlsx)**, save as `source/kano_sheet.xlsx`.
+2. Run `pip install pandas openpyxl` once, then `python tools/build_data.py`.
+3. Upload the `data/` folder to GitHub. (The script keeps only the latest 3 months; change `MONTHS_TO_SHOW` at the top of the script to match `monthsToShow`.)
+
+The script also writes `source/data_check.csv`, a list of sheet rows worth fixing
+(blank store codes, #REF! errors, duplicate rows, blank points).
+
+Store names, cities, regions etc. come from `source/store_details.xlsx`. Stores that are in the
+sheet but not in that file still work, using their store code as the name.
 
 ## Languages and wording
-All wording on the dashboard lives in `assets/i18n.js`, one block per language
-(English, Hindi, Bengali, Marathi, Telugu, Tamil, Gujarati, Kannada, Malayalam).
-- To change a word, edit the text inside the quotes. Keep anything in `{curly brackets}` exactly as it is.
-- If a word is missing in a language, the English version is shown instead.
-- Please have a native speaker from each region read through their language once; a few words may be more natural in local store usage.
-- The mistake details (what went wrong, how to fix it) come from the audit data and are shown as written.
+All wording lives in `assets/i18n.js`, one block per language. Edit text inside the quotes and
+keep anything in `{curly brackets}` as it is. Missing words fall back to English.
+Please have a native speaker from each region check their language once.
+
+## Files
+- `index.html`, `assets/` — the site. `assets/config.js` holds the settings.
+- `data/` — backup data generated by the script. Don't edit by hand.
+- `source/` — your inputs, plus `data_check.csv`.
