@@ -33,3 +33,11 @@ To update the store list, replace `source/store_details.xlsx` and run the script
 - `data/` — generated files the site reads. Don't edit by hand.
 - `source/` — your inputs. `tools/build_data.py` turns them into `data/`.
 - To change the "Raise a concern" form link, edit `CONCERN_FORM` at the top of `assets/app.js`.
+
+## Languages and wording
+All wording on the dashboard lives in `assets/i18n.js`, one block per language
+(English, Hindi, Bengali, Marathi, Telugu, Tamil, Gujarati, Kannada, Malayalam).
+- To change a word, edit the text inside the quotes. Keep anything in `{curly brackets}` exactly as it is.
+- If a word is missing in a language, the English version is shown instead.
+- Please have a native speaker from each region read through their language once; a few words may be more natural in local store usage.
+- The mistake details (what went wrong, how to fix it) come from the audit data and are shown as written.

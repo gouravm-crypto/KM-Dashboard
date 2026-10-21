@@ -66,8 +66,9 @@
   color-scheme: dark;
 }
 :root {
-  --display: "Marcellus", "Optima", "Palatino Linotype", Georgia, serif;
-  --sans: "Jost", "Futura", "Century Gothic", "Segoe UI", system-ui, sans-serif;
+  --script: "Jost";
+  --display: "Marcellus", var(--script), "Optima", "Palatino Linotype", Georgia, serif;
+  --sans: "Jost", var(--script), "Futura", "Century Gothic", "Segoe UI", system-ui, sans-serif;
   --ease: cubic-bezier(.22, .8, .24, 1);
 }
 
@@ -110,9 +111,10 @@ img { max-width: 100%; display: block; }
 .theme-toggle svg { width: 20px; height: 20px; }
 .theme-toggle .moon { display: var(--logo-light); }
 .theme-toggle .sun { display: var(--logo-dark); }
-.home-toggle {
+.home-tools {
   position: absolute; z-index: 5;
   top: calc(1.2rem + env(safe-area-inset-top, 0px)); right: 1.2rem;
+  display: flex; gap: .6rem; align-items: center;
 }
 
 /* ---------- Home ---------- */
@@ -618,3 +620,44 @@ table.km tr:last-child td { border-bottom: 0; }
 @media (max-width: 640px) { .gauge-num { font-size: 3.6rem; } }
 
 .stat-prev { font-size: .88rem; color: var(--band-muted); margin-top: .2rem; }
+
+/* ---------- Language picker ---------- */
+.lang-pick {
+  position: relative;
+  display: inline-flex; align-items: center;
+  flex: none;
+  border: 1px solid var(--band-line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  padding-left: .8rem;
+}
+.lang-pick svg { width: 18px; height: 18px; color: var(--accent); flex: none; }
+.lang-pick select {
+  appearance: none;
+  border: 0; background: transparent;
+  padding: .62rem 1rem .62rem .45rem;
+  font-size: .95rem;
+  cursor: pointer;
+  color: inherit;
+}
+.lang-pick select:focus-visible { outline: none; }
+.lang-pick:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.en-note {
+  margin: 0 0 1rem;
+  font-size: .9rem;
+  color: var(--muted);
+  padding: .55rem .9rem;
+  border-radius: 12px;
+  background: var(--surface-2);
+  display: inline-block;
+}
+/* Indian scripts need a little more line space */
+html:not([lang="en"]) body { line-height: 1.7; }
+html:not([lang="en"]) .store-name, html:not([lang="en"]) .home h1, html:not([lang="en"]) .audit-title { line-height: 1.25; }
+@media (max-width: 640px) {
+  .topbar-tools { flex-wrap: wrap; }
+  .topbar .search { flex: 1 1 100%; }
+  .month-select { flex: 1; max-width: none; }
+  .home-tools { top: calc(.8rem + env(safe-area-inset-top, 0px)); right: .8rem; }
+}

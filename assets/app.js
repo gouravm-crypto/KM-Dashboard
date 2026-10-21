@@ -4,11 +4,11 @@
 
   // ---------- Settings you may want to change ----------
   const CONCERN_FORM = "https://forms.gle/MSzcAjEk1ut4M6Pc9";
-  const AUDITS = [
-    { key: "ppt", name: "PPT audit", tab: "PPT" },
-    { key: "vc", name: "Video call audit", tab: "Video call" },
-    { key: "cctv", name: "CCTV audit", tab: "CCTV" },
-  ];
+  const AUDITS = ["ppt", "vc", "cctv"].map((key) => ({
+    key,
+    get name() { return t("audit_" + key); },
+    get tab() { return t("tab_" + key); },
+  }));
 
   // ---------- Data ----------
   const STORES = window.KM_STORES || [];
@@ -36,21 +36,76 @@
   const app = document.getElementById("app");
   const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  // ---------- Language ----------
+  const I18N = window.KM_I18N || { languages: [{ code: "en", name: "English", locale: "en-IN", font: "" }], strings: { en: {} } };
+  const LANGS = I18N.languages;
+  let lang = "en";
+  try { lang = localStorage.getItem("km-lang") || "en"; } catch (e) { /* storage unavailable */ }
+  if (!LANGS.some((l) => l.code === lang)) lang = "en";
+  function langInfo() { return LANGS.find((l) => l.code === lang) || LANGS[0]; }
+  // t("key", {n: 3, month: "October"}) returns the wording in the chosen language (English if missing)
+  function t(key, vars) {
+    vars = vars || {};
+    const S = I18N.strings[lang] || {}, E = I18N.strings.en || {};
+    const k1 = vars.n === 1 ? key + "_one" : null;
+    let out;
+    if (k1 && S[k1] != null) out = S[k1];
+    else if (S[key] != null) out = S[key];
+    else if (k1 && E[k1] != null) out = E[k1];
+    else out = E[key] != null ? E[key] : key;
+    return out.replace(/\{(\w+)\}/g, (m, v) => (vars[v] != null ? vars[v] : m));
+  }
+  function applyLang() {
+    const L = langInfo();
+    document.documentElement.lang = L.code;
+    document.documentElement.style.setProperty("--script", L.font ? '"' + L.font + '"' : '"Jost"');
+    if (L.font && !document.getElementById("font-" + L.code)) {
+      const link = document.createElement("link");
+      link.id = "font-" + L.code;
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=" + L.font.replace(/ /g, "+") + ":wght@400;500;600&display=swap";
+      document.head.appendChild(link);
+    }
+  }
+  function langSelect() {
+    return '<label class="lang-pick"><span class="sr-only">' + t("lang_label") + "</span>" +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.7 2.6 15.3 0 18M12 3c-2.6 2.7-2.6 15.3 0 18"/></svg>' +
+      '<select data-lang-select>' + LANGS.map((l) => '<option value="' + l.code + '"' + (l.code === lang ? " selected" : "") + ">" + l.name + "</option>").join("") + "</select></label>";
+  }
+  function bindLang() {
+    app.querySelectorAll("[data-lang-select]").forEach((sel) => sel.addEventListener("change", () => {
+      lang = sel.value;
+      try { localStorage.setItem("km-lang", lang); } catch (e) { /* storage unavailable */ }
+      applyLang();
+      route();
+    }));
+  }
+  // Common English values in the audit data shown in the chosen language
+  function val(v) {
+    if (/^store$/i.test(v)) return t("who_store");
+    if (/^yes$/i.test(v)) return t("yes");
+    if (/^no$/i.test(v)) return t("no");
+    return v;
+  }
   function monthLabel(m, short) {
     if (!m) return "";
     const [y, mm] = m.split("-").map(Number);
-    const n = MONTH_NAMES[mm - 1] || m;
-    return short ? n.slice(0, 3) : n + " " + y;
+    try {
+      return new Intl.DateTimeFormat(langInfo().locale, short ? { month: lang === "en" ? "short" : "long" } : { month: "long", year: "numeric" }).format(new Date(y, mm - 1, 1));
+    } catch (e) {
+      const n = MONTH_NAMES[mm - 1] || m;
+      return short ? n.slice(0, 3) : n + " " + y;
+    }
   }
   function prettyDate(d) {
     if (!d) return "";
-    let m = d.match(/^(\d{1,2})[-:/.](\d{1,2})[-:/.](\d{4})$/);
-    if (m) return +m[1] + " " + MONTH_NAMES[+m[2] - 1].slice(0, 3) + " " + m[3];
-    m = d.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (m) return +m[3] + " " + MONTH_NAMES[+m[2] - 1].slice(0, 3) + " " + m[1];
-    return d;
+    let m = d.match(/^(\d{1,2})[-:/.](\d{1,2})[-:/.](\d{4})$/), dt = null;
+    if (m) dt = new Date(+m[3], +m[2] - 1, +m[1]);
+    else if ((m = d.match(/^(\d{4})-(\d{2})-(\d{2})/))) dt = new Date(+m[1], +m[2] - 1, +m[3]);
+    if (!dt) return d;
+    try { return new Intl.DateTimeFormat(langInfo().locale, { day: "numeric", month: lang === "en" ? "short" : "long", year: "numeric" }).format(dt); }
+    catch (e) { return dt.getDate() + " " + MONTH_NAMES[dt.getMonth()].slice(0, 3) + " " + dt.getFullYear(); }
   }
-  const plural = (n, one, many) => n + " " + (n === 1 ? one : many || one + "s");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const isError = (r) => (Number(r.d) || 0) > 0 || !!(r.e || r.w);
@@ -73,11 +128,11 @@
   function delta(cur, prev, prevMonth, lowerIsBetter) {
     if (cur == null || prev == null) return "";
     const d = Math.round((cur - prev) * 100) / 100;
-    const vs = " from " + monthLabel(prevMonth, true);
-    if (d === 0) return '<span class="delta same">Same as ' + monthLabel(prevMonth, true) + "</span>";
+    const mon = monthLabel(prevMonth, true);
+    if (d === 0) return '<span class="delta same">' + t("same_as", { month: mon }) + "</span>";
     const good = lowerIsBetter ? d < 0 : d > 0;
     return '<span class="delta ' + (good ? "good" : "bad") + '">' + (d > 0 ? ICON.up : ICON.down) +
-      (d > 0 ? "Up " : "Down ") + Math.abs(d) + vs + "</span>";
+      t(d > 0 ? "more_than" : "less_than", { n: Math.abs(d), month: mon }) + "</span>";
   }
 
   // ---------- CaratLane "C" mark, traced from the logo (20 diamonds) ----------
@@ -113,7 +168,7 @@
     if (v >= 80) return mix("#6CCB8F", "#178A4C", (v - 80) / 20);
     return mix("#E8898B", "#9E0B1C", Math.min(1, (79 - v) / 69));
   }
-  const scoreStatus = (v) => (v >= 80 ? "On track" : "Needs attention");
+  const scoreStatus = (v) => (v >= 80 ? t("status_good") : t("status_bad"));
 
   // ---------- Score ring (fills clockwise from 12 o'clock) ----------
   const G = { c: 125, r: 104 };
@@ -149,9 +204,9 @@
   function kmChange(cur, prev) {
     if (cur == null || prev == null) return "";
     const d = cur - prev;
-    if (d === 0) return '<span class="delta same">Same this month</span>';
+    if (d === 0) return '<span class="delta same">' + t("no_change") + "</span>";
     return '<span class="delta ' + (d > 0 ? "good" : "bad") + '">' + (d > 0 ? ICON.up : ICON.down) +
-      (d > 0 ? "Up " : "Down ") + Math.abs(d) + " to " + cur + "</span>";
+      t(d > 0 ? "km_up" : "km_down", { n: Math.abs(d), cur }) + "</span>";
   }
 
   // ---------- Confetti for 95 and above ----------
@@ -203,7 +258,7 @@
 
   // ---------- Light / dark ----------
   function themeBtn(extra) {
-    return '<button type="button" class="theme-toggle' + (extra ? " " + extra : "") + '" data-theme-toggle aria-label="Switch light or dark mode">' +
+    return '<button type="button" class="theme-toggle' + (extra ? " " + extra : "") + '" data-theme-toggle aria-label="' + t("theme_label") + '">' +
       '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>' +
       '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></button>';
   }
@@ -278,11 +333,11 @@
   function searchHTML(compact) {
     const id = "s" + (++searchSeq);
     return '<form class="search' + (compact ? " compact" : "") + '" role="search" data-search autocomplete="off">' +
-      '<label class="sr-only" for="' + id + '">Search by store name, code or email</label>' +
+      '<label class="sr-only" for="' + id + '">' + t("search_label") + "</label>" +
       '<div class="search-field">' + ICON.search +
       '<input id="' + id + '" type="search" role="combobox" aria-expanded="false" aria-controls="' + id + '-list" aria-autocomplete="list" placeholder="' +
-      (compact ? "Search stores" : "Store name, code or email") + '" spellcheck="false">' +
-      '<button class="search-go" type="submit">Search</button></div>' +
+      (compact ? t("search_ph_short") : t("search_ph")) + '" spellcheck="false">' +
+      '<button class="search-go" type="submit">' + t("search_btn") + "</button></div>" +
       '<ul class="results" id="' + id + '-list" role="listbox" hidden></ul></form>';
   }
   function bindSearch(form) {
@@ -294,7 +349,7 @@
       if (!q.trim()) { close(); return; }
       items = matchStores(q);
       if (!items.length) {
-        list.innerHTML = '<li class="result-empty">No store matches "' + esc(q.trim()) + '". Try the store code, like CFMYSNXM.</li>';
+        list.innerHTML = '<li class="result-empty">' + t("no_match", { q: esc(q.trim()) }) + "</li>";
       } else {
         list.innerHTML = items.map((s, i) =>
           '<li class="result" role="option" id="' + list.id + "-" + i + '" data-i="' + i + '" aria-selected="' + (i === active) + '">' +
@@ -338,22 +393,23 @@
     app.innerHTML = '<div class="view">' + html + "</div>";
     app.querySelectorAll("[data-search]").forEach(bindSearch);
     bindTheme();
+    bindLang();
     animateCounts(app);
     window.scrollTo(0, 0);
     if (after) after();
   }
 
   function viewHome() {
-    document.title = "Kano Model store reports | CaratLane";
-    const latest = MONTHS[0] ? "Latest cycle: " + monthLabel(MONTHS[0]) + ". " : "";
+    document.title = t("title_site");
     render(
-      '<section class="home">' + themeBtn("home-toggle") +
+      '<section class="home"><div class="home-tools">' + langSelect() + themeBtn() + "</div>" +
       '<div class="home-mark">' + markSVG() + "</div>" +
       '<div class="home-inner">' + logos("home-logo") +
-      "<h1>Kano Model store reports</h1>" +
-      '<p class="home-lede">Find your store to see this month’s score, every audit observation, and how it compares with last month.</p>' +
+      "<h1>" + t("home_h1") + "</h1>" +
+      '<p class="home-lede">' + t("home_lede") + "</p>" +
       searchHTML(false) +
-      '<p class="home-meta">' + latest + STORES.length + ' stores.<span class="kbd-hint"> Press <kbd>/</kbd> to search.</span></p>' +
+      '<p class="home-meta">' + t("home_meta", { month: monthLabel(MONTHS[0]), n: STORES.length }) +
+      '<span class="kbd-hint"> ' + t("kbd_hint", { key: "<kbd>/</kbd>" }) + "</span></p>" +
       "</div></section>",
       () => { const i = app.querySelector(".home input"); if (i && window.innerWidth > 640) setTimeout(() => i.focus({ preventScroll: true }), 1100); }
     );
@@ -361,10 +417,10 @@
 
   function topbar(code, month, audit) {
     const opts = MONTHS.map((m) => '<option value="' + m + '"' + (m === month ? " selected" : "") + ">" + monthLabel(m) + "</option>").join("");
-    return '<div class="topbar"><a href="#/" aria-label="All stores, back to search">' + logos("topbar-logo") + "</a>" +
+    return '<div class="topbar"><a href="#/" aria-label="' + t("all_stores") + '">' + logos("topbar-logo") + "</a>" +
       '<div class="topbar-tools">' + searchHTML(true) +
-      (MONTHS.length ? '<label class="sr-only" for="monthSel">Report month</label><select id="monthSel" class="month-select" data-code="' + esc(code) + '" data-audit="' + (audit || "") + '">' + opts + "</select>" : "") +
-      themeBtn() + "</div></div>";
+      (MONTHS.length ? '<label class="sr-only" for="monthSel">' + t("month_label") + '</label><select id="monthSel" class="month-select" data-code="' + esc(code) + '" data-audit="' + (audit || "") + '">' + opts + "</select>" : "") +
+      langSelect() + themeBtn() + "</div></div>";
   }
   function bindMonth() {
     const sel = document.getElementById("monthSel");
@@ -373,20 +429,19 @@
     });
   }
   function facts(s) {
-    const f = [["Region", s.region], ["City", s.city], ["State", s.state], ["Format", s.format], ["Type", s.type], ["Tier", s.tier]];
+    const f = [[t("region"), s.region], [t("city"), s.city], [t("state"), s.state], [t("format"), s.format], [t("type"), s.type], [t("tier"), s.tier]];
     return '<dl class="facts">' + f.map(([k, v], n) => '<div style="--n:' + n + '"><dt>' + k + "</dt><dd>" + esc(v || "–") + "</dd></div>").join("") + "</dl>";
   }
   function concern() {
-    return '<section class="section"><div class="concern"><p><strong>Something in this report doesn’t look right?</strong>' +
-      "Tell the quality team which observation you’d like reviewed and why.</p>" +
-      '<a class="btn solid" href="' + CONCERN_FORM + '" target="_blank" rel="noopener">Raise a concern ' + ICON.ext + "</a></div></section>";
+    return '<section class="section"><div class="concern"><p><strong>' + t("concern_q") + "</strong>" + t("concern_p") + "</p>" +
+      '<a class="btn solid" href="' + CONCERN_FORM + '" target="_blank" rel="noopener">' + t("concern_btn") + " " + ICON.ext + "</a></div></section>";
   }
-  const footer = () => '<footer class="foot"><div class="wrap">Kano Model reports by the CaratLane quality team. Scores start at 100 and each observation can deduct points.</div></footer>';
+  const footer = () => '<footer class="foot"><div class="wrap">' + t("footer") + "</div></footer>";
 
   function viewNotFound(code) {
     render('<header class="band"><div class="wrap">' + topbar("", MONTHS[0]) + '</div></header><main class="body"><div class="wrap"><div class="empty">' +
-      "<h2>No store with code " + esc(code) + "</h2><p>Check the code or search by store name or email instead.</p>" +
-      '<a class="btn ghost" href="#/">Back to search</a></div></div></main>', bindMonth);
+      "<h2>" + t("nf_title", { code: esc(code) }) + "</h2><p>" + t("nf_p") + "</p>" +
+      '<a class="btn ghost" href="#/">' + t("back_search") + "</a></div></div></main>", bindMonth);
   }
 
   async function viewStore(code, month, audit) {
@@ -401,45 +456,45 @@
   }
 
   function viewOverview(s, month, prevMonth, rep, prev) {
-    document.title = s.name + " | Kano Model " + monthLabel(month);
+    document.title = s.name + " | " + t("title_site");
     const id =
-      '<p class="crumb"><a href="#/">All stores</a> &nbsp;/&nbsp; Report for ' + monthLabel(month) + "</p>" +
+      '<p class="crumb"><a href="#/">' + t("all_stores") + "</a> &nbsp;/&nbsp; " + t("report_for", { month: monthLabel(month) }) + "</p>" +
       '<h1 class="store-name">' + esc(s.name) + "</h1>" +
       '<p class="ids"><span class="code">' + esc(s.code) + "</span><span>" + esc(s.erp) + '</span><a href="mailto:' + esc(s.email) + '">' + esc(s.email) + "</a></p>" + facts(s);
 
     if (!rep) {
       render('<header class="band"><div class="band-mark">' + markSVG(4) + '</div><div class="wrap">' + topbar(s.code, month) +
         '<div class="hero"><div class="identity">' + id + "</div></div></div></header>" +
-        '<main class="body"><div class="wrap"><div class="empty"><h2>No report for ' + monthLabel(month) + "</h2>" +
-        "<p>This store hasn’t received a Kano Model report for this cycle yet. Pick another month from the menu above.</p></div></div></main>" + footer(), bindMonth);
+        '<main class="body"><div class="wrap"><div class="empty"><h2>' + t("noreport_title", { month: monthLabel(month) }) + "</h2>" +
+        "<p>" + t("noreport_p") + "</p></div></div></main>" + footer(), bindMonth);
       return;
     }
 
     const pm = prev ? prevMonth : null;
     const score =
-      '<div class="scorecard"><div class="gauge" role="img" aria-label="Kano Model score ' + esc(rep.km) + ' out of 100" style="--score-color:' + mix(scoreColor(rep.km), "#1A0610", .35) + '">' + gaugeSVG(scoreColor(rep.km)) +
-      '<div class="gauge-center"><div class="gauge-num">0<small>/100</small></div><div class="gauge-label">Kano Model score</div><div class="status">' + scoreStatus(rep.km) + "</div></div></div>" +
+      '<div class="scorecard"><div class="gauge" role="img" aria-label="' + t("km_score") + " " + esc(rep.km) + '/100" style="--score-color:' + mix(scoreColor(rep.km), "#1A0610", .35) + '">' + gaugeSVG(scoreColor(rep.km)) +
+      '<div class="gauge-center"><div class="gauge-num">0<small>/100</small></div><div class="gauge-label">' + t("km_score") + '</div><div class="status">' + scoreStatus(rep.km) + "</div></div></div>" +
       '<div class="side-stats">' +
-      (pm ? '<div class="stat"><div class="stat-label">KM score, ' + monthLabel(pm) + '</div><div class="stat-num" style="color:' + scoreColor(prev.km) + '" data-count="' + esc(prev.km ?? "") + '">' + esc(prev.km ?? "–") + "</div>" + kmChange(rep.km, prev.km) + "</div>" : "") +
-      '<div class="stat" style="--n:1"><div class="stat-label">CCL score</div><div class="stat-num" data-count="' + esc(rep.ccl ?? "") + '">' + esc(rep.ccl ?? "–") + "</div>" + (pm ? delta(rep.ccl, prev.ccl, pm, false) : "") + "</div>" +
-      '<div class="stat" style="--n:2"><div class="stat-label">Points deducted</div><div class="stat-num" data-count="' + esc(rep.deducted ?? sumPts(rep.rows)) + '">' + esc(rep.deducted ?? sumPts(rep.rows)) + "</div>" + (pm && prev.deducted != null ? '<div class="stat-prev">' + monthLabel(pm, true) + ": " + esc(prev.deducted) + "</div>" : "") + "</div>" +
+      (pm ? '<div class="stat"><div class="stat-label">' + t("km_in", { month: monthLabel(pm) }) + '</div><div class="stat-num" style="color:' + scoreColor(prev.km) + '" data-count="' + esc(prev.km ?? "") + '">' + esc(prev.km ?? "–") + "</div>" + kmChange(rep.km, prev.km) + "</div>" : "") +
+      '<div class="stat" style="--n:1"><div class="stat-label">' + t("ccl_score") + '</div><div class="stat-num" data-count="' + esc(rep.ccl ?? "") + '">' + esc(rep.ccl ?? "–") + "</div>" + (pm ? delta(rep.ccl, prev.ccl, pm, false) : "") + "</div>" +
+      '<div class="stat" style="--n:2"><div class="stat-label">' + t("points_lost") + '</div><div class="stat-num" data-count="' + esc(rep.deducted ?? sumPts(rep.rows)) + '">' + esc(rep.deducted ?? sumPts(rep.rows)) + "</div>" + (pm && prev.deducted != null ? '<div class="stat-prev">' + monthLabel(pm, true) + ": " + esc(prev.deducted) + "</div>" : "") + "</div>" +
       "</div></div>";
 
     const panels = AUDITS.map((a, n) => {
       const rows = auditRows(rep, a.key), errs = rows.filter(isError), pts = sumPts(rows);
       const prevPts = prev ? sumPts(auditRows(prev, a.key)) : null;
       return '<a class="audit-panel reveal" style="--d:' + (700 + n * 120) + 'ms" href="#/s/' + s.code + "/" + month + "/" + a.key + '"><h3>' + a.name + "</h3>" +
-        '<div class="audit-points" data-count="' + pts + '">' + pts + '</div><div class="audit-points-label">' + (pts === 1 ? "point" : "points") + " deducted</div>" +
-        '<div class="audit-foot"><span>' + plural(errs.length, "observation") + (prev ? ", " + monthLabel(pm, true) + ": " + plural(prevPts, "point") : "") + "</span>" +
-        '<span class="audit-open">View details ' + ICON.arrow + "</span></div></a>";
+        '<div class="audit-points" data-count="' + pts + '">' + pts + '</div><div class="audit-points-label">' + t("pts_lost_label", { n: pts }) + "</div>" +
+        '<div class="audit-foot"><span>' + t("mistakes_n", { n: errs.length }) + (prev ? "<br>" + t("last_month_pts", { n: prevPts }) : "") + "</span>" +
+        '<span class="audit-open">' + t("see_details") + " " + ICON.arrow + "</span></div></a>";
     }).join("");
 
     render(
       '<header class="band"><div class="band-mark">' + markSVG(4) + '</div><div class="wrap">' + topbar(s.code, month) +
       '<div class="hero"><div class="identity">' + id + "</div>" + score + "</div></div></header>" +
       '<main class="body"><div class="wrap">' +
-      '<section class="section"><div class="section-head"><h2>Audits</h2><p class="section-note">' +
-      (rep.sent ? "Report sent " + prettyDate(rep.sent) + ". " : "") + "Open an audit to see each observation and how to fix it.</p></div>" +
+      '<section class="section"><div class="section-head"><h2>' + t("audits") + '</h2><p class="section-note">' +
+      (rep.sent ? t("report_sent", { date: prettyDate(rep.sent) }) + " " : "") + t("audits_note") + "</p></div>" +
       '<div class="audits">' + panels + "</div></section>" +
       comparison(rep, prev, month, pm) + concern() +
       "</div></main>" + footer(),
@@ -465,8 +520,8 @@
 
   function comparison(rep, prev, month, pm) {
     if (!prev) {
-      return '<section class="section"><div class="section-head"><h2>Compared with last month</h2></div>' +
-        '<p class="empty-note">There’s no earlier report for this store yet, so there’s nothing to compare against.</p></section>';
+      return '<section class="section"><div class="section-head"><h2>' + t("compare_first") + "</h2></div>" +
+        '<p class="empty-note">' + t("no_prev") + "</p></section>";
     }
     const legend = '<div class="legend"><span class="prev"><i></i>' + monthLabel(pm) + '</span><span class="cur"><i></i>' + monthLabel(month) + "</span></div>";
     const byAudit = AUDITS.map((a) => ({ name: a.name, prev: sumPts(auditRows(prev, a.key)), cur: sumPts(auditRows(rep, a.key)) }));
@@ -488,46 +543,45 @@
       if (!prevErr.has(k) || seen.has(k)) return false;
       seen.add(k); return true;
     });
-    const auditName = (k) => (AUDITS.find((a) => a.key === k) || { tab: k }).tab;
     const repeatHTML = repeats.length
       ? '<ul class="repeats">' + repeats.map((r) => {
         const p = prevErr.get(norm(r.p));
         return '<li class="repeat"><div class="repeat-p">' + esc(r.p) + '</div><div class="repeat-meta">' +
-          auditName(r.a) + " audit this month. In " + monthLabel(pm, true) + ": " + esc(p.e || p.i || "flagged") + "</div></li>";
+          t("repeat_meta", { audit: (AUDITS.find((a) => a.key === r.a) || { name: r.a }).name, text: esc(p.e || p.i || "") }) + "</div></li>";
       }).join("") + "</ul>"
-      : '<p class="empty-note">Nothing flagged in ' + monthLabel(pm) + " came up again. Well done.</p>";
+      : '<p class="empty-note">' + t("repeat_none", { month: monthLabel(pm) }) + "</p>";
 
-    return '<section class="section"><div class="section-head"><h2>Compared with ' + monthLabel(pm) + "</h2>" +
-      '<p class="section-note">Points deducted in each cycle.</p></div>' +
+    return '<section class="section"><div class="section-head"><h2>' + t("compare_title", { month: monthLabel(pm) }) + "</h2>" +
+      '<p class="section-note">' + t("compare_note") + "</p></div>" +
       '<div class="compare">' +
-      '<div class="card reveal" style="--d:900ms"><h3>By audit</h3><p class="hint">Where the points were lost.</p>' + legend + barRows(byAudit, max) + "</div>" +
-      '<div class="card reveal" style="--d:1000ms"><h3>By attribute</h3><p class="hint">What the points were lost on.</p>' + legend + (byAttr.length ? barRows(byAttr, max) : '<p class="empty-note">No points deducted in either month.</p>') + "</div>" +
-      '<div class="card reveal" style="grid-column:1/-1;--d:1100ms"><h3>Repeated from last month</h3><p class="hint">' +
-      (repeats.length ? plural(repeats.length, "observation") + " flagged in " + monthLabel(pm) + " showed up again." : "Issues that came back are listed here.") + "</p>" + repeatHTML + "</div>" +
+      '<div class="card reveal" style="--d:900ms"><h3>' + t("by_audit") + '</h3><p class="hint">' + t("by_audit_hint") + "</p>" + legend + barRows(byAudit, max) + "</div>" +
+      '<div class="card reveal" style="--d:1000ms"><h3>' + t("by_area") + '</h3><p class="hint">' + t("by_area_hint") + "</p>" + legend + (byAttr.length ? barRows(byAttr, max) : '<p class="empty-note">' + t("none_lost") + "</p>") + "</div>" +
+      '<div class="card reveal" style="grid-column:1/-1;--d:1100ms"><h3>' + t("repeat_title") + '</h3><p class="hint">' +
+      (repeats.length ? t("repeat_hint", { n: repeats.length, month: monthLabel(pm) }) : t("repeat_hint_none")) + "</p>" + repeatHTML + "</div>" +
       "</div></section>";
   }
 
   function obsCard(r, i, repeatSet) {
     const pts = Number(r.d) || 0;
     const repeat = repeatSet && repeatSet.has(norm(r.p));
-    const meta = [["Input", r.i], ["Who made the error", r.w], ["Timestamp / error category", r.t], ["Final rating", r.r]].filter(([, v]) => v);
+    const meta = [[t("m_input"), val(r.i)], [t("m_who"), val(r.w)], [t("m_time"), r.t], [t("m_rating"), r.r]].filter(([, v]) => v);
     return '<article class="obs" style="--i:' + i + '">' +
-      '<div class="obs-tags">' + (r.at ? '<span class="tag">' + esc(r.at) + "</span>" : "") + (repeat ? '<span class="tag repeat-tag">Also flagged last month</span>' : "") + "</div>" +
-      '<div class="pts"><div class="pts-num' + (pts ? "" : " zero") + '">' + (pts ? "−" + pts : "0") + '</div><div class="pts-label">' + (pts === 1 ? "point" : "points") + "</div></div>" +
+      '<div class="obs-tags">' + (r.at ? '<span class="tag">' + esc(r.at) + "</span>" : "") + (repeat ? '<span class="tag repeat-tag">' + t("tag_repeat") + "</span>" : "") + "</div>" +
+      '<div class="pts"><div class="pts-num' + (pts ? "" : " zero") + '">' + (pts ? "−" + pts : "0") + '</div><div class="pts-label">' + t("pts_label", { n: pts }) + "</div></div>" +
       "<h3>" + esc(r.p) + "</h3>" +
       '<div class="obs-body">' +
-      (r.e ? '<div class="obs-found"><h4>What was found</h4><p>' + esc(r.e) + "</p></div>" : "") +
-      (r.f ? '<div class="obs-fix"><h4>How to correct it</h4><p>' + esc(r.f) + "</p></div>" : "") +
+      (r.e ? '<div class="obs-found"><h4>' + t("what_wrong") + "</h4><p>" + esc(r.e) + "</p></div>" : "") +
+      (r.f ? '<div class="obs-fix"><h4>' + t("how_fix") + "</h4><p>" + esc(r.f) + "</p></div>" : "") +
       "</div>" +
       (meta.length ? '<dl class="obs-meta">' + meta.map(([k, v]) => "<div><dt>" + k + "</dt><dd>" + esc(v) + "</dd></div>").join("") + "</dl>" : "") +
       "</article>";
   }
 
   function tableHTML(rows) {
-    const H = ["Audit type", "Parameter", "Input", "Who made the error", "Error explanation", "How to correct the error", "Timestamp / error category", "Final rating", "Points deducted", "Attribute"];
+    const H = [t("th_audit"), t("th_param"), t("m_input"), t("m_who"), t("what_wrong"), t("how_fix"), t("m_time"), t("m_rating"), t("th_points"), t("th_area")];
     const name = (k) => (AUDITS.find((a) => a.key === k) || { name: k }).name;
     return '<div class="table-wrap"><table class="km"><thead><tr>' + H.map((h) => '<th scope="col">' + h + "</th>").join("") + "</tr></thead><tbody>" +
-      rows.map((r) => "<tr><td>" + esc(name(r.a)) + "</td><td>" + esc(r.p) + "</td><td>" + esc(r.i) + "</td><td>" + esc(r.w) + "</td><td>" + esc(r.e) +
+      rows.map((r) => "<tr><td>" + esc(name(r.a)) + "</td><td>" + esc(r.p) + "</td><td>" + esc(val(r.i)) + "</td><td>" + esc(val(r.w)) + "</td><td>" + esc(r.e) +
         "</td><td>" + esc(r.f) + "</td><td>" + esc(r.t) + "</td><td>" + esc(r.r) + '</td><td class="num">' + esc(r.d) + "</td><td>" + esc(r.at) + "</td></tr>").join("") +
       "</tbody></table></div>";
   }
@@ -535,7 +589,7 @@
   let auditMode = "cards";
   function viewAudit(s, month, prevMonth, rep, prev, key) {
     const a = AUDITS.find((x) => x.key === key);
-    document.title = a.name + " | " + s.name + " | Kano Model";
+    document.title = a.name + " | " + s.name + " | " + t("title_site");
     const rows = auditRows(rep, key), errs = rows.filter(isError), checks = rows.filter((r) => !isError(r));
     const prevRows = auditRows(prev, key), prevErrs = prevRows.filter(isError);
     const pm = prev ? prevMonth : null;
@@ -544,7 +598,7 @@
     const byStore = errs.filter((r) => /store/i.test(r.w)).length;
     const byOther = errs.length - byStore;
 
-    const tabs = '<nav class="tabs" aria-label="Audit types">' + AUDITS.map((x) => {
+    const tabs = '<nav class="tabs" aria-label="' + t("audits") + '">' + AUDITS.map((x) => {
       const n = auditRows(rep, x.key).filter(isError).length;
       return '<a class="tab" href="#/s/' + s.code + "/" + month + "/" + x.key + '"' + (x.key === key ? ' aria-current="page"' : "") + ">" + x.tab +
         '<span class="tab-count">' + n + "</span></a>";
@@ -552,51 +606,52 @@
 
     let ctx = "";
     if (rep && key === "vc" && rep.vc && rep.vc.link) {
-      ctx = '<div class="context"><a class="btn ghost" href="' + esc(rep.vc.link) + '" target="_blank" rel="noopener">Open video call recordings ' + ICON.ext + "</a></div>";
+      ctx = '<div class="context"><a class="btn ghost" href="' + esc(rep.vc.link) + '" target="_blank" rel="noopener">' + t("watch_vc") + " " + ICON.ext + "</a></div>";
     } else if (rep && key === "cctv" && rep.cctv && (rep.cctv.date || rep.cctv.start)) {
       const c = rep.cctv;
-      const items = [["Footage date", prettyDate(c.date)], ["Start", c.start], ["End", c.end], ["Total duration", c.duration], ["Most viewed category", c.viewed || "Not recorded"]];
+      const items = [[t("cctv_date"), prettyDate(c.date)], [t("start_time"), c.start], [t("end_time"), c.end], [t("total_time"), c.duration], [t("most_viewed"), c.viewed || t("not_recorded")]];
       ctx = '<div class="context card"><dl>' + items.map(([k, v]) => "<div><dt>" + k + "</dt><dd>" + esc(v || "–") + "</dd></div>").join("") + "</dl></div>";
     }
 
     let body;
     if (!rep) {
-      body = '<div class="empty"><h2>No report for ' + monthLabel(month) + "</h2><p>Pick another month from the menu above.</p></div>";
+      body = '<div class="empty"><h2>' + t("noreport_title", { month: monthLabel(month) }) + "</h2><p>" + t("noreport_p_short") + "</p></div>";
     } else if (!rows.length) {
-      body = ctx + '<div class="empty"><h2>Nothing recorded</h2><p>This audit has no observations for ' + monthLabel(month) + ".</p></div>";
+      body = ctx + '<div class="empty"><h2>' + t("nothing_recorded") + "</h2><p>" + t("nothing_recorded_p", { month: monthLabel(month) }) + "</p></div>";
     } else {
       body = ctx +
-        '<div class="toolbar"><h2>' + (errs.length ? plural(errs.length, "observation") : "No observations") + '</h2><div class="seg" role="group" aria-label="Layout">' +
-        '<button type="button" data-mode="cards" aria-pressed="' + (auditMode === "cards") + '">Cards</button>' +
-        '<button type="button" data-mode="table" aria-pressed="' + (auditMode === "table") + '">Table</button></div></div>' +
+        '<div class="toolbar"><h2>' + (errs.length ? t("found_n", { n: errs.length }) : t("none_found")) + '</h2><div class="seg" role="group" aria-label="' + t("layout") + '">' +
+        '<button type="button" data-mode="cards" aria-pressed="' + (auditMode === "cards") + '">' + t("cards") + "</button>" +
+        '<button type="button" data-mode="table" aria-pressed="' + (auditMode === "table") + '">' + t("table") + "</button></div></div>" +
+        (lang !== "en" && t("en_note") ? '<p class="en-note">' + t("en_note") + "</p>" : "") +
         '<div data-cards' + (auditMode === "cards" ? "" : " hidden") + ">" +
-        (errs.length ? '<div class="obs-list">' + errs.map((r, i) => obsCard(r, i, repeatSet)).join("") + "</div>" : '<p class="empty-note">No errors found in this audit.</p>') +
-        (checks.length ? '<div class="section-head" style="margin-top:2.4rem"><h2 style="font:500 1.4rem/1.2 var(--display);margin:0">Other checks</h2><p class="section-note">Recorded with no points deducted.</p></div>' +
+        (errs.length ? '<div class="obs-list">' + errs.map((r, i) => obsCard(r, i, repeatSet)).join("") + "</div>" : '<p class="empty-note">' + t("no_errors_audit") + "</p>") +
+        (checks.length ? '<div class="section-head" style="margin-top:2.4rem"><h2 style="font:400 1.4rem/1.2 var(--display);margin:0">' + t("other_checks") + '</h2><p class="section-note">' + t("other_checks_note") + "</p></div>" +
           '<ul class="checks">' + checks.map((r, n) => {
             const no = /^no$/i.test(r.i);
             return '<li class="check" style="--n:' + n + '"><span class="check-mark' + (no ? " no" : "") + '">' + (no ? ICON.cross : ICON.tick) + "</span><span>" + esc(r.p) +
-              '<div class="check-input">' + esc(r.i || r.r) + "</div></span></li>";
+              '<div class="check-input">' + esc(val(r.i || r.r)) + "</div></span></li>";
           }).join("") + "</ul>" : "") +
         "</div>" +
         '<div data-table' + (auditMode === "table" ? "" : " hidden") + ">" + tableHTML(rows) + "</div>";
     }
     if (prev && prevErrs.length) {
-      body += '<details class="prev-month"><summary>' + ICON.chev + monthLabel(pm) + " observations (" + prevErrs.length + ")</summary>" +
+      body += '<details class="prev-month"><summary>' + ICON.chev + t("prev_mistakes", { month: monthLabel(pm), n: prevErrs.length }) + "</summary>" +
         '<div class="obs-list">' + prevErrs.map((r, i) => obsCard(r, i, null)).join("") + "</div></details>";
     }
 
     const prevPts = prev ? sumPts(prevRows) : null;
     const stats = rep
       ? '<div class="audit-stats">' +
-        '<div class="stat"><div class="stat-label">Points deducted</div><div class="stat-num" data-count="' + pts + '">' + pts + "</div>" + (pm ? delta(pts, prevPts, pm, true) : "") + "</div>" +
-        '<div class="stat"><div class="stat-label">Errors by store</div><div class="stat-num" data-count="' + byStore + '">' + byStore + "</div></div>" +
-        (byOther ? '<div class="stat"><div class="stat-label">Errors by other teams</div><div class="stat-num">' + byOther + "</div></div>" : "") +
-        '<div class="stat"><div class="stat-label">Kano Model score</div><div class="stat-num" style="color:' + scoreColor(rep.km) + '">' + esc(rep.km) + "</div></div></div>"
+        '<div class="stat"><div class="stat-label">' + t("points_lost") + '</div><div class="stat-num" data-count="' + pts + '">' + pts + "</div>" + (pm ? delta(pts, prevPts, pm, true) : "") + "</div>" +
+        '<div class="stat"><div class="stat-label">' + t("mistakes_by_store") + '</div><div class="stat-num" data-count="' + byStore + '">' + byStore + "</div></div>" +
+        (byOther ? '<div class="stat"><div class="stat-label">' + t("mistakes_by_others") + '</div><div class="stat-num">' + byOther + "</div></div>" : "") +
+        '<div class="stat"><div class="stat-label">' + t("km_score") + '</div><div class="stat-num" style="color:' + scoreColor(rep.km) + '">' + esc(rep.km) + "</div></div></div>"
       : "";
 
     render(
       '<header class="band"><div class="band-mark">' + markSVG(4) + '</div><div class="wrap">' + topbar(s.code, month, key) +
-      '<div class="audit-hero"><p class="crumb"><a href="#/">All stores</a> &nbsp;/&nbsp; <a href="#/s/' + s.code + "/" + month + '">' + esc(s.name) + " (" + esc(s.code) + ")</a> &nbsp;/&nbsp; " + monthLabel(month) + "</p>" +
+      '<div class="audit-hero"><p class="crumb"><a href="#/">' + t("all_stores") + '</a> &nbsp;/&nbsp; <a href="#/s/' + s.code + "/" + month + '">' + esc(s.name) + " (" + esc(s.code) + ")</a> &nbsp;/&nbsp; " + monthLabel(month) + "</p>" +
       '<h1 class="audit-title">' + a.name + "</h1>" + stats + tabs + "</div></div></header>" +
       '<main class="body"><div class="wrap">' + body + '<div style="margin-top:3rem">' + concern() + "</div></div></main>" + footer(),
       () => {
@@ -620,6 +675,7 @@
       viewHome();
     }
   }
+  applyLang();
   window.addEventListener("hashchange", route);
   document.addEventListener("keydown", (e) => {
     if (e.key === "/" && !/input|textarea|select/i.test(document.activeElement.tagName)) {
