@@ -65,18 +65,26 @@ def month_of_cycle(v):
 
 
 def month_of_date(v):
+    """Audit cycle from the audit date: 26th of the previous month to 25th of this month."""
+    y = mo = dd = None
     if isinstance(v, (datetime, date)) and getattr(v, "year", 0) > 2000:
-        return f"{v.year}-{v.month:02d}"
-    s = text(v)
-    m = re.match(r"(\d{4})-(\d{1,2})-\d{1,2}", s)
-    if m:
-        return f"{m.group(1)}-{int(m.group(2)):02d}"
-    m = re.match(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})", s)   # day first (Indian format)
-    if m:
-        a, b = int(m.group(1)), int(m.group(2))
-        mon = a if b > 12 else b
-        return f"{m.group(3)}-{mon:02d}"
-    return None
+        y, mo, dd = v.year, v.month, v.day
+    else:
+        s = text(v)
+        m = re.match(r"(\d{4})-(\d{1,2})-(\d{1,2})", s)
+        if m:
+            y, mo, dd = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        m = m or re.match(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})", s)   # day first (Indian format)
+        if m and y is None:
+            a, b = int(m.group(1)), int(m.group(2))
+            y, mo, dd = int(m.group(3)), (a if b > 12 else b), (b if b > 12 else a)
+    if y is None:
+        return None
+    if dd >= 26:
+        mo += 1
+        if mo == 13:
+            y, mo = y + 1, 1
+    return f"{y}-{mo:02d}"
 
 
 def write_js(path, var, key, payload):
@@ -156,8 +164,8 @@ def main():
         pts = number(pts_raw)
         if not p and pts is None:
             continue
-        if p and pts is None:
-            issues.append((rown, "Points blank (counted as 0)", f"{code}: {p[:50]}"))
+        if p and pts is None and (text(get(row, "e")) or text(get(row, "f"))):
+            issues.append((rown, "Mistake written up but no points entered (counted as 0)", f"{code}: {p[:50]}"))
         if "#REF" in " ".join(text(x) for x in row):
             issues.append((rown, "#REF! error in row", code))
         sig = tuple(text(x) for x in row)

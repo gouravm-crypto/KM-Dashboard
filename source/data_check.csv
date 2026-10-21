@@ -5,16 +5,7 @@ Sheet row,Issue,Details
 5283,Exact duplicate of an earlier row (still counted),CFHYDKHJ: Solitaire Display [Replica rings placed correctly 
 5284,Exact duplicate of an earlier row (still counted),CFHYDKHJ: Solitaire Display [Kit kept in correct format]
 5285,Exact duplicate of an earlier row (still counted),CFHYDKHJ: Cash counter [Policy cards damaged and not in disp
-5604,Points blank (counted as 0),CRSILCCM: No Error
-5638,Points blank (counted as 0),CFGWHCCM: No Error
-5643,Points blank (counted as 0),CFVJWMGR: No Error
-5808,Points blank (counted as 0),CFGNTWPM: No Error
-5823,Points blank (counted as 0),CRIMPDMR: No Error
-7574,Points blank (counted as 0),CFBKRSTM: Display Elements (Flatbed/Niche/Other Units) [SKU 
-7616,Points blank (counted as 0),CFBBREOM: Store Upkeep 2 [Soft Toys are clean]
 7616,#REF! error in row,CFBBREOM
-7997,Points blank (counted as 0),CFKOLAPM: Display Elements (Flatbed/Niche/Other Units) [SKU 
-8095,Points blank (counted as 0),CFKOLBHL: Display Elements (Flatbed/Niche/Other Units) [Inco
 8095,#REF! error in row,CFKOLBHL
 8146,Exact duplicate of an earlier row (still counted),CRBERDNR: Facade [Signage Logo Intact and Clean - CE]
 8147,Exact duplicate of an earlier row (still counted),CRBERDNR: Solitaire Display [Solitaire Display kit Removed]
@@ -28,7 +19,6 @@ Sheet row,Issue,Details
 8742,Exact duplicate of an earlier row (still counted),CFKOLCC1: Solitaire Display [Solitaire Display kit Removed]
 8887,Exact duplicate of an earlier row (still counted),CFSBPBDR: How many instances were JC/SM/Intern/other Staffs 
 8888,Exact duplicate of an earlier row (still counted),CFSBPBDR: How many instances JC didnt were badges
-8920,Points blank (counted as 0),CRBBRJNP: Image was not uploaded / Incorrect image uploaded
 8964,Exact duplicate of an earlier row (still counted),CFBRMNTR: How Many customers we didnt offer Beverages/ water
 9049,Exact duplicate of an earlier row (still counted),CFMUZKLM: Solitaire Display [Solitaire Display kit Removed]
 9050,Exact duplicate of an earlier row (still counted),CFMUZKLM: Solitaire Display [Color master available ]
@@ -64,9 +54,9 @@ Sheet row,Issue,Details
 9562,Exact duplicate of an earlier row (still counted),CRHISPLA: Facade [Facade clean and well maintained - CE]
 9563,Exact duplicate of an earlier row (still counted),CRHISPLA: Facade [Siganage is Updated - CE Projects]
 9565,Exact duplicate of an earlier row (still counted),CRHISPLA: Facade [Siganage is Updated - CE Projects]
-9604,Points blank (counted as 0),CFKARKPR: Display Elements (Flatbed/Niche/Other Units) [Tags
-9608,Points blank (counted as 0),CFKARKPR: Solitaire Display [Only Solitaire SKUs displayed]
-9621,Points blank (counted as 0),CRAMBCNT: Store Hygiene [Music playing in Store]
+9604,Mistake written up but no points entered (counted as 0),CFKARKPR: Display Elements (Flatbed/Niche/Other Units) [Tags
+9608,Mistake written up but no points entered (counted as 0),CFKARKPR: Solitaire Display [Only Solitaire SKUs displayed]
+9621,Mistake written up but no points entered (counted as 0),CRAMBCNT: Store Hygiene [Music playing in Store]
 9652,Blank store code,
 9759,Blank store code,
 9760,Blank store code,
@@ -76,14 +66,8 @@ Sheet row,Issue,Details
 11758,Exact duplicate of an earlier row (still counted),CFNOIGCM: Solitaire Display [Solitaire Display kit Removed]
 11759,Exact duplicate of an earlier row (still counted),CFNOIGCM: Solitaire Display [Color master available ]
 11760,Exact duplicate of an earlier row (still counted),CFNOIGCM: Solitaire Display [Replica Tray Available]
-11959,Points blank (counted as 0),CLDELSTX: Solitaire Display [Solitaire Display kit Removed]
-11960,Points blank (counted as 0),CLDELSTX: Solitaire Display [Color master available ]
-11961,Points blank (counted as 0),CLDELSTX: Solitaire Display [Replica Tray Available]
-12747,Points blank (counted as 0),CADELOCM: Store Upkeep 2 [Soft Toys are clean]
 12747,#REF! error in row,CADELOCM
-12748,Points blank (counted as 0),CFFDBPFM: Store Upkeep 2 [Soft Toys are clean]
 12748,#REF! error in row,CFFDBPFM
-12751,Points blank (counted as 0),CFNOIGBS: Store Upkeep 2 [Soft Toys are clean]
 12751,#REF! error in row,CFNOIGBS
 13254,Blank store code,How many instances were JC/SM/Intern/other Staffs groomng wa
 13255,Blank store code,How many instances JC didnt were badges
@@ -96,13 +80,10 @@ Sheet row,Issue,Details
 15721,Exact duplicate of an earlier row (still counted),CFIDRPCM: Solitaire Display [Replica Tray Available]
 15722,Exact duplicate of an earlier row (still counted),CFIDRPCM: Grooming Errors [Unfirom Issues ]
 16734,Exact duplicate of an earlier row (still counted),CFIDRPCM: Image was not uploaded / Incorrect image uploaded
-19173,Points blank (counted as 0),CFPATSMO: Facade [Signage Logo Intact and Clean - CE]
-19492,Points blank (counted as 0),CFKNPSWN: Facade [Facade clean and well maintained - CE]
-19553,Points blank (counted as 0),CFAYDRMP: Cash counter [Correct order -Policy card (6) -CE]
-19706,Points blank (counted as 0),CFAZMNRC: Display Elements (Flatbed/Niche/Other Units) [Inco
-19713,Points blank (counted as 0),CFAZMNRC: Cash counter [Policy cards damaged and not in disp
-19914,Points blank (counted as 0),CFPATHBR: Solitaire Display [Only Solitaire SKUs displayed]
-19937,Points blank (counted as 0),CFPATKRB: How many Instances were JC didnt use the jewellery
-19939,Points blank (counted as 0),CFLKWLUM: How many instances were JC/SM/Intern/other Staffs 
-19984,Points blank (counted as 0),CFPATBCR: Display Elements (Flatbed/Niche/Other Units) [VM D
-20164,Points blank (counted as 0),CFLKWMHN: Facade [Facade clean and well maintained - CE]
+19492,Mistake written up but no points entered (counted as 0),CFKNPSWN: Facade [Facade clean and well maintained - CE]
+19553,Mistake written up but no points entered (counted as 0),CFAYDRMP: Cash counter [Correct order -Policy card (6) -CE]
+19706,Mistake written up but no points entered (counted as 0),CFAZMNRC: Display Elements (Flatbed/Niche/Other Units) [Inco
+19713,Mistake written up but no points entered (counted as 0),CFAZMNRC: Cash counter [Policy cards damaged and not in disp
+19914,Mistake written up but no points entered (counted as 0),CFPATHBR: Solitaire Display [Only Solitaire SKUs displayed]
+19937,Mistake written up but no points entered (counted as 0),CFPATKRB: How many Instances were JC didnt use the jewellery
+19984,Mistake written up but no points entered (counted as 0),CFPATBCR: Display Elements (Flatbed/Niche/Other Units) [VM D

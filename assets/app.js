@@ -59,7 +59,15 @@
     if (m && MON3.includes(m[1].slice(0, 3).toLowerCase()) && +m[2] > 2000) return m[2] + "-" + pad2(MON3.indexOf(m[1].slice(0, 3).toLowerCase()) + 1);
     return null;
   }
-  function dateMonth(v) { const d = readDate(v); return d && d[0] > 2000 && d[1] >= 1 && d[1] <= 12 ? d[0] + "-" + pad2(d[1]) : null; }
+  // Audit cycle from the audit date: 26th of the previous month to 25th of this month
+  // (so an audit on 26 September belongs to the October cycle)
+  function dateMonth(v) {
+    const d = readDate(v);
+    if (!d || d[0] <= 2000 || d[1] < 1 || d[1] > 12) return null;
+    let y = d[0], m = d[1];
+    if (d[2] >= 26) { m += 1; if (m === 13) { m = 1; y += 1; } }
+    return y + "-" + pad2(m);
+  }
   function isoDate(v) { const d = readDate(v); return d && d[0] > 2000 ? d[0] + "-" + pad2(d[1]) + "-" + pad2(d[2]) : String(v || "").trim(); }
   const normH = (h) => String(h).toLowerCase().replace(/[^a-z0-9]/g, "");
   function finder(header) {
