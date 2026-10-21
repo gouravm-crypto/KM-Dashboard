@@ -1,0 +1,10 @@
+Store Code,Audit Type,Parameter,Input,Who made the Error,Error Explanation,How to Correct the error,Timestamp / Error Category,Final Rating,Points Deducted,Attribute
+CFMYSNXM,PPT Audit,Solitaire Display [Replica rings placed correctly in the tray],No,Store,Rings in the kit have been interchanged,Kindly keep the kit in correct format,Error,Error,1,Solitailre Display
+CFMYSNXM,VC Audit,Display Elements (Flatbed/Niche/Other Units) [Empty props in display],1,Store,Empty prop in display in Bracelet flatbed,Kindly avoid keeping empty props on display,Error,Error,1,Display Elements
+CFMYSNXM,VC Audit,Solitaire Display [Solitaire Display kit Removed],Yes,,,,Data,Data,0,Solitailre Display
+CFMYSNXM,VC Audit,Solitaire Display [Color master available ],Yes,,,,Data,Data,0,Solitailre Display
+CFMYSNXM,VC Audit,Solitaire Display [Replica Tray Available],Yes,,,,Data,Data,0,Solitailre Display
+CFMYSNXM,VC Audit,Solitaire Display [Replica rings placed correctly in the tray],No,Store,Rings in the kit have been interchanged,Kindly keep the kit in correct format,Error,Error,1,Solitailre Display
+CFMYSNXM,VC Audit,Grooming Errors [Other Accessories ],1,Store,Male JC wrong watch worn,Kindly follow grooming standards,Error,Error,1,Grooming
+CFMYSNXM,VC Audit,[Service wall -CE],Incorrect wording,VM Team,POP is not changed to TC,Kindly get it changed,CE,CE,0,Store Maintanence
+CFMYSNXM,CCTV Audit,How Many customers we didnt offer Beverages/ water? (Was water offered or asked),Applcable but no errors,,,,,No Errors,0,Etiquette

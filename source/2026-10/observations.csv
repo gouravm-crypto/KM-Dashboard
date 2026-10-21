@@ -1,0 +1,16 @@
+Store Code,Audit Type,Parameter,Input,Who made the Error,Error Explanation,How to Correct the error,Timestamp / Error Category,Final Rating,Points Deducted,Attribute
+CFMYSNXM,CCTV Audit,How Many customers we didnt offer Beverages/ water? (Was water offered or asked),1,Store,Water was Not provided,Kindly provide water to every customer,18:04:00,CE,10,Etiquette
+CFMYSNXM,CCTV Audit,How many instances JC didnt were badges,1,Store,1 JC wore wrong watch and 1 JC badge not worn,Kindly follow Grooming Standards,"17:35:17, 17:39:13",CE,10,Grooming
+CFMYSNXM,PPT Audit,Image was not uploaded / Incorrect image uploaded,less than 3 (1 Error),Store,Entire Solitaire flatbd not coverd,Kindly uplod the entire image,Multi,Error,1,PPT
+CFMYSNXM,PPT Audit,Display Elements (Flatbed/Niche/Other Units) [Incorrect call out /No call out ],1,Store,Please update the call out in the Necklaces section. It is incorrectly named 'Necklce sets',Kindly change the call out for the same.,Error,Error,1,Display Elements
+CFMYSNXM,PPT Audit,[Service wall -CE],Incorrect wording,VM Team,POP is not changed to TC,Kindly get it changed,CE,CE,0,Store Maintanence
+CFMYSNXM,VC Audit,Display Elements (Flatbed/Niche/Other Units) [Incorrect call out /No call out ],2,Store,"In Mangalsutra niche Traditional Mangalsutras are kept but the callout kept is Modern Mangalsutra, In Necklace niche callout kept is Necklace Sets",Kindly change the same,Error/BOD,Error/BOD,1,Display Elements
+CFMYSNXM,VC Audit,Display Elements (Flatbed/Niche/Other Units) [Tags not hidden],1,Store,"Tags were visible in the earring, Earring flatbed",Need to hide the tag always.,Error/BOD,Error/BOD,0,Display Elements
+CFMYSNXM,VC Audit,Display Elements (Flatbed/Niche/Other Units) [Catergory cutouts are intact and in good condition],1,Store,Mangalsutra cutout is covering one design,Kindly arrange the jewellery ina way that they don't get hidden because of the callouts,Error,Error,1,Display Elements
+CFMYSNXM,VC Audit,Display Elements (Flatbed/Niche/Other Units) [Panel Falling down or not in position],1,Store,The panel seems to be out of position and is slanting in Butterfly niche,Kindly get this fixed,Error,Error,1,Display Elements
+CFMYSNXM,VC Audit,Grooming Errors [Shoes and Belt],1,Store,JC shoes are wrong,Kindly follow Grooming standards,Error,Error,1,Grooming
+CFMYSNXM,VC Audit,Solitaire Display [Solitaire Display kit Removed],Yes,,,,Data,Data,0,Solitailre Display
+CFMYSNXM,VC Audit,Solitaire Display [Color master available ],Yes,,,,Data,Data,0,Solitailre Display
+CFMYSNXM,VC Audit,Solitaire Display [Replica Tray Available],Yes,,,,Data,Data,0,Solitailre Display
+CFMYSNXM,VC Audit,Solitaire Display [Replica rings placed correctly in the tray],No,Store,Rings in the kit have been interchanged,Kindly keep the kit in correct format,Error,Error,1,Solitailre Display
+CFMYSNXM,VC Audit,[Service wall -CE],Incorrect wording,VM Team,POP is not changed to TC,Kindly get it changed,CE,CE,0,Store Maintanence
